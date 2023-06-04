@@ -1,0 +1,7 @@
+NEwBlueTwoSearch.xcodeproj/xcuserdata/
+NEwBlueTwoSearch.xcworkspace/
+Pods/
+*.swp
+Podfile.lock
+.DS_Store
+NEwBlueTwoSearch.xcodeproj/project.xcworkspace/xcuserdata/
