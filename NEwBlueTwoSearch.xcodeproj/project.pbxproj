@@ -34,6 +34,7 @@
 		D8E76A192A2CB7CB008BD289 /* NEwSettingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A182A2CB7CB008BD289 /* NEwSettingPageView.swift */; };
 		D8E76A1B2A2CC375008BD289 /* NEwManualPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1A2A2CC375008BD289 /* NEwManualPageView.swift */; };
 		D8E76A1D2A2CD36E008BD289 /* NEwSearchingBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */; };
+		D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */; };
 		EBF49E9907D95F9FA6DBC275 /* Pods_NEwBlueTwoSearch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B9AA163C554EB5C9F9E40EE /* Pods_NEwBlueTwoSearch.framework */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,7 @@
 		D8E76A182A2CB7CB008BD289 /* NEwSettingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSettingPageView.swift; sourceTree = "<group>"; };
 		D8E76A1A2A2CC375008BD289 /* NEwManualPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwManualPageView.swift; sourceTree = "<group>"; };
 		D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSearchingBottomView.swift; sourceTree = "<group>"; };
+		D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKNRingProgressView.swift; sourceTree = "<group>"; };
 		D9A85237F94174B73FA55D54 /* Pods-NEwBlueTwoSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NEwBlueTwoSearch.release.xcconfig"; path = "Target Support Files/Pods-NEwBlueTwoSearch/Pods-NEwBlueTwoSearch.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -122,6 +124,7 @@
 		D8E769D62A2C6ADA008BD289 /* NEwBlueTwoSearch */ = {
 			isa = PBXGroup;
 			children = (
+				D8E76A1E2A2E2F4F008BD289 /* RingProgress */,
 				D8E76A132A2C994A008BD289 /* PageViews */,
 				D8E76A022A2C86A9008BD289 /* SpeedUILayoutChain */,
 				D8E76A012A2C70F1008BD289 /* BlueManager */,
@@ -208,6 +211,14 @@
 				D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */,
 			);
 			path = PageViews;
+			sourceTree = "<group>";
+		};
+		D8E76A1E2A2E2F4F008BD289 /* RingProgress */ = {
+			isa = PBXGroup;
+			children = (
+				D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */,
+			);
+			path = RingProgress;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -340,6 +351,7 @@
 				D8E769FD2A2C6E94008BD289 /* Device.generated.swift in Sources */,
 				D8E769F42A2C6D2F008BD289 /* KRHudExtensions.swift in Sources */,
 				D8E769DC2A2C6ADA008BD289 /* ViewController.swift in Sources */,
+				D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */,
 				D8E769D82A2C6ADA008BD289 /* AppDelegate.swift in Sources */,
 				D8E76A1D2A2CD36E008BD289 /* NEwSearchingBottomView.swift in Sources */,
 				D8E769F22A2C6D2F008BD289 /* KRProgressHUDViewController.swift in Sources */,
