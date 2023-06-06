@@ -10,10 +10,15 @@ import UIKit
 class NEwSearchingBottomView: UIView {
 
     var collection: UICollectionView!
-    
+    var closeClickBlock: (()->Void)?
+    var itemclickBlock: ((NEwPeripheralItem)->Void)?
+    var refreshWating: Bool = false
+    var allDevicePreviewView: [BSiegBlueDeviceSearchingPreview] = []
+    var cellSize: CGSize = CGSize.zero
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        cellSize = CGSize(width: CGFloat(Int(UIScreen.main.bounds.size.width / 3)), height: 140)
         setupV()
     }
     
@@ -61,7 +66,7 @@ class NEwSearchingBottomView: UIView {
         //
         
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
+        layout.scrollDirection = .vertical
         collection = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
         collection.showsVerticalScrollIndicator = false
         collection.showsHorizontalScrollIndicator = false
@@ -77,24 +82,67 @@ class NEwSearchingBottomView: UIView {
         collection.register(cellWithClass: NEwSearchingItemCell.self)
     }
 
-    
     @objc func closeBtnClick() {
+        closeClickBlock?()
+    }
+}
+
+extension NEwSearchingBottomView {
+    
+    func fetchSearchingContents() {
+        if !refreshWating {
+            refreshWating = true
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.6) {
+                [weak self] in
+                guard let `self` = self else {return}
+                self.refreshWating = false
+            }
+            //
+            var currentSearchingPreviews: [BSiegBlueDeviceSearchingPreview] = []
+            //
+            for item in NEwBlueToolManager.default.peripheralItemList {
+                
+                var currenPre: BSiegBlueDeviceSearchingPreview!
+                if let piver = allDevicePreviewView.first(where: { pre in
+                    pre.peripheralItem == item
+                }) {
+                    currenPre = piver
+                } else {
+                    let vie = BSiegBlueDeviceSearchingPreview(frame: CGRect(origin: CGPoint(x: 0, y: 0), size: cellSize), peripheralItem: item)
+                    currenPre = vie
+                }
+                currenPre.updateItemContentStatus()
+                currentSearchingPreviews.append(currenPre)
+            }
+            //
+            sortedDeviceItems(list: currentSearchingPreviews)
+            
+        }
         
+    }
+    
+    func sortedDeviceItems(list: [BSiegBlueDeviceSearchingPreview]) {
+        var listpro: [BSiegBlueDeviceSearchingPreview] = []
+        listpro = list.sorted { item1, item2 in
+            return item1.peripheralItem.rssi > item2.peripheralItem.rssi
+        }
+        allDevicePreviewView = listpro
+        collection.reloadData()
     }
 }
 
 extension NEwSearchingBottomView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withClass: NEwSearchingItemCell.self, for: indexPath)
-        
-        
+        let prev = allDevicePreviewView[indexPath.item]
+        cell.contentBgV.removeSubviews()
+        cell.contentBgV.addSubview(prev)
         
         return cell
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+        return allDevicePreviewView.count
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -125,7 +173,8 @@ extension NEwSearchingBottomView: UICollectionViewDelegateFlowLayout {
 
 extension NEwSearchingBottomView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        let prev = allDevicePreviewView[indexPath.item]
+        itemclickBlock?(prev.peripheralItem)
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
@@ -135,7 +184,8 @@ extension NEwSearchingBottomView: UICollectionViewDelegate {
 
 
 class NEwSearchingItemCell: UICollectionViewCell {
-    let contentV = UIView()
+    let contentBgV = UIView()
+    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -148,8 +198,8 @@ class NEwSearchingItemCell: UICollectionViewCell {
     
     func setupView() {
         
-        contentView.addSubview(contentV)
-        contentImgV.snp.makeConstraints {
+        contentView.addSubview(contentBgV)
+        contentBgV.snp.makeConstraints {
             $0.top.right.bottom.left.equalToSuperview()
         }
         
@@ -157,18 +207,17 @@ class NEwSearchingItemCell: UICollectionViewCell {
     }
 }
 
-class BSiegBlueDevicePreview: UIView {
+class BSiegBlueDeviceSearchingPreview: UIView {
     
     var peripheralItem: NEwPeripheralItem
-     
-    let contentImgV = UIImageView()
+    let deviceIconImgV = UIImageView()
     let deviceNameLabel = UILabel()
-    let describeLabel = UILabel()
+    let distanceLabel = UILabel()
     
     var ringProgressView = RingProgressView()
     
     init(frame: CGRect, peripheralItem: NEwPeripheralItem) {
-        self.peripheralItem = NEwPeripheralItem
+        self.peripheralItem = peripheralItem
         super.init(frame: frame)
         setupView()
     }
@@ -177,13 +226,12 @@ class BSiegBlueDevicePreview: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     func setupView() {
         self.backgroundColor = .white
-        self.layer.cornerRadius = 20
+        self.layer.cornerRadius = 10
         //
         let iconbgV = UIView()
-        self.addSubview(iconbgV)
+        addSubview(iconbgV)
         iconbgV.backgroundColor = UIColor(hexString: "#E8EDFF")
         iconbgV.snp.makeConstraints {
             $0.centerY.equalToSuperview()
@@ -193,76 +241,63 @@ class BSiegBlueDevicePreview: UIView {
         iconbgV.layer.cornerRadius = 24
         iconbgV.clipsToBounds = true
         //
-        contentImgV.contentMode = .scaleAspectFit
-        contentImgV.clipsToBounds = true
-        addSubview(contentImgV)
-        contentImgV.snp.makeConstraints {
+        deviceIconImgV.contentMode = .scaleAspectFit
+        deviceIconImgV.clipsToBounds = true
+        iconbgV.addSubview(deviceIconImgV)
+        deviceIconImgV.snp.makeConstraints {
             $0.center.equalTo(iconbgV)
             $0.width.height.equalTo(32)
         }
         //
-        iconbgV.addSubview(ring1V)
-        ring1V.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
-        ring1V.startColor = UIColor(hexString: "#3971FF")!
-        ring1V.endColor = UIColor(hexString: "#3971FF")!
-        ring1V.ringWidth = 3
-        ring1V.backgroundRingColor = .clear
-        ring1V.hidesRingForZeroProgress = true
-        ring1V.shadowOpacity = 0
-        ring1V.progress = 0
-        //
+        iconbgV.addSubview(ringProgressView)
+        ringProgressView.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
+        ringProgressView.progress = 0
+        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.backgroundRingColor = .clear
+        ringProgressView.ringWidth = 3
+        ringProgressView.shadowOpacity = 0
+        ringProgressView.hidesRingForZeroProgress = true
         
-        self.addSubview(deviceNameLabel)
+        //
         deviceNameLabel.font = UIFont(name: "Poppins-Bold", size: 14)
         deviceNameLabel.textColor = UIColor(hexString: "#242766")
         deviceNameLabel.lineBreakMode = .byTruncatingTail
-        deviceNameLabel.textAlignment = .left
+        deviceNameLabel.numberOfLines = 2
+        deviceNameLabel.textAlignment = .center
+        addSubview(deviceNameLabel)
         deviceNameLabel.snp.makeConstraints {
-            $0.left.equalTo(iconbgV.snp.right).offset(15)
-            $0.top.equalTo(iconbgV.snp.top)
-            $0.bottom.equalTo(iconbgV.snp.centerY)
-            $0.right.equalToSuperview().offset(-50)
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(iconbgV.snp.bottom).offset(4)
+            $0.bottom.equalToSuperview().offset(-25)
+            $0.left.equalToSuperview().offset(10)
         }
         
         //
-        self.addSubview(describeLabel)
-        describeLabel.font = UIFont(name: "Poppins-Medium", size: 12)
-        describeLabel.textColor = UIColor(hexString: "#242766")?.withAlphaComponent(0.5)
-//        describeLabel.lineBreakMode = .byTruncatingTail
-        describeLabel.adjustsFontSizeToFitWidth = true
-        describeLabel.textAlignment = .left
-        describeLabel.snp.makeConstraints {
-            $0.left.equalTo(iconbgV.snp.right).offset(15)
-            $0.top.equalTo(iconbgV.snp.centerY)
-            $0.bottom.equalTo(iconbgV.snp.bottom)
-            $0.right.equalToSuperview().offset(-50)
+        addSubview(distanceLabel)
+        distanceLabel.font = UIFont(name: "Poppins-Medium", size: 12)
+        distanceLabel.textColor = UIColor(hexString: "#242766")?.withAlphaComponent(0.5)
+        distanceLabel.adjustsFontSizeToFitWidth = true
+        distanceLabel.textAlignment = .center
+        distanceLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(deviceNameLabel.snp.bottom)
+            $0.bottom.equalToSuperview()
+            $0.left.equalToSuperview().offset(10)
         }
-        
-        //
-        let arrowImgV = UIImageView()
-        arrowImgV.contentMode = .scaleAspectFit
-        arrowImgV.image = UIImage(named: "CaretRight")
-        arrowImgV.clipsToBounds = true
-        addSubview(arrowImgV)
-        arrowImgV.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.right.equalToSuperview().offset(-14)
-            $0.width.height.equalTo(20)
-        }
-         
-        //
         
     }
      
-    func updateContent() {
+    func updateItemContentStatus() {
         
-        let deviceIconStr = peripheralItem.deviceTagIconName(isSmall: true)
         let deviceNameStr = peripheralItem.deviceName
+        let deviceIconStr = peripheralItem.deviceTagIconName(isSmall: true)
         let distancePercent = peripheralItem.deviceDistancePercent()
-        debugPrint("cell update deviceName: \(deviceNameStr) distancePercent - \(distancePercent)")
-        contentImgV.image = UIImage(named: deviceIconStr)
+        let distanceAboutM = peripheralItem.fetchAboutDistanceString()
+        //
+        ringProgressView.progress = distancePercent
+        deviceIconImgV.image = UIImage(named: deviceIconStr)
         deviceNameLabel.text = deviceNameStr
-        ring1V.progress = distancePercent
-        describeLabel.text = peripheralItem.fetchDistanceString()
+        distanceLabel.text = distanceAboutM
     }
 }

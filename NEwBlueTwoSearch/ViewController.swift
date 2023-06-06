@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import EasySwiftLayout
+
 
 class ViewController: UIViewController {
 

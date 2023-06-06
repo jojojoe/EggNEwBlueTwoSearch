@@ -11,7 +11,6 @@ target 'NEwBlueTwoSearch' do
   pod 'SwifterSwift'
   pod 'SwiftyStoreKit'
   pod 'TPInAppReceipt'
-  pod 'EasySwiftLayout'
   pod 'LookinServer', :configurations => ['Debug']
   
 end

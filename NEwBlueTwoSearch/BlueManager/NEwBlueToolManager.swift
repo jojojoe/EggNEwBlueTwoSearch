@@ -7,17 +7,229 @@
 
 import Foundation
 import UIKit
-
-
+import CoreBluetooth
+import AVFoundation
+import AudioToolbox
 
 
 class NEwBlueToolManager: NSObject {
     static let `default` = NEwBlueToolManager()
+    var centralManager: CBCentralManager!
+    var peripheralItemList: [NEwPeripheralItem] = []
+    var cachaedPeripheralItemList: [NEwPeripheralItem] = []
+    let queue = DispatchQueue(label: "fetchqueue", qos: .background)
+    var deviceBluetoothDeniedBlock: (()->Void)?
+    var favoriteDevicesIdList: [String] = []
+    var centralManagerStatus: Bool?
+    let discoverDeviceNotiName: NSNotification.Name = NSNotification.Name.init("not_ScaningDeviceUpdate")
+    let trackingDeviceNotiName: NSNotification.Name = NSNotification.Name.init("trackingDeviceUpdate")
+    var currentTrackingItem: NEwPeripheralItem?
+    var currentTrackingItemRssi: Double?
+    var currentTrackingItemName: String?
     
+    let slowVoice = "did_slow.mp3"
+    let fastVoice = "did_fast.mp3"
+    
+    var audioPlayer: AVAudioPlayer?
+    var currentAudioType: String?
+    var feedTimer: Timer?
+    
+    
+    
+    override init() {
+        super.init()
+        fetchUserFavorites()
+    }
+    
+    func prepare() {
+        centralManager = CBCentralManager(delegate: self, queue: queue)
+    }
+    
+    
+    func startScan() {
+        DispatchQueue.global().async {
+            [weak self] in
+            guard let `self` = self else {return}
+            self.centralManagerScan()
+        }
+    }
+    
+    func stopScan() {
+        cachaedPeripheralItemList = peripheralItemList
+        centralManager.stopScan()
+    }
+    
+    func centralManagerScan() {
+       self.centralManager.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey : true])
+   }
+   
+    func fetchUserFavorites() {
+        favoriteDevicesIdList = UserDefaults.standard.object(forKey: "ud_favoriteDevicesId") as? [String] ?? []
+        debugPrint("favoriteDevicesIdList = \(favoriteDevicesIdList.count)")
+    }
+    
+    func addUserFavorite(deviceId: String) {
+        favoriteDevicesIdList.append(deviceId)
+        UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
+        UserDefaults.standard.synchronize()
+    }
+    
+    func removeUserFavorite(deviceId: String) {
+        if favoriteDevicesIdList.contains(deviceId) {
+            favoriteDevicesIdList.removeAll { item in
+                item == deviceId
+            }
+            UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
+            UserDefaults.standard.synchronize()
+        }
+    }
+}
+
+extension NEwBlueToolManager {
+    func audioSlowVoiceStyle() -> String {
+        if let item = currentTrackingItem {
+            let persent = item.deviceDistancePercent()
+            if persent <= 0.7 {
+                return slowVoice
+            } else {
+                return fastVoice
+            }
+        }
+        return slowVoice
+    }
+    
+    func playAudio() {
+        let prepareAudio = audioSlowVoiceStyle()
+        if prepareAudio == currentAudioType {
+            return
+        }
+        currentAudioType = prepareAudio
+        if audioPlayer?.isPlaying == true {
+            stopAudio()
+        }
+        if let bundlePath = Bundle.main.path(forResource: prepareAudio, ofType: nil), let url = URL(string: bundlePath) {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.numberOfLoops = -1
+//                audioPlayer?.delegate = self
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
+            } catch {
+                debugPrint("error = \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func stopAudio() {
+        if let audioP = audioPlayer {
+            audioP.stop()
+            currentAudioType = nil
+            audioPlayer = nil
+        }
+    }
+    
+    //
+    func playVibInterval() -> TimeInterval {
+        if let item = currentTrackingItem {
+            let persent = item.deviceDistancePercent()
+            if persent <= 0.3 {
+                return 6
+            } else if persent <= 0.7 {
+                return 3.5
+            } else {
+                return 1.5
+            }
+        }
+        return 1
+    }
+    
+    func playFeedVib() {
+        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+        
+        stopVibTimer()
+        
+        func addnewTimer(interval: TimeInterval) {
+            let timer = Timer.new(every: interval) {
+                [weak self] in
+                guard let `self` = self else {return}
+                DispatchQueue.main.async {
+                    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+                }
+            }
+            feedTimer = timer
+            timer.start()
+        }
+        
+        addnewTimer(interval: playVibInterval())
+        
+    }
+    
+    func stopVibTimer() {
+        if let timer = feedTimer {
+            timer.invalidate()
+            feedTimer = nil
+        }
+    }
+
+}
+
+extension NEwBlueToolManager: CBCentralManagerDelegate {
+    func sendDiscoverDeviceNotification() {
+        NotificationCenter.default.post(name: discoverDeviceNotiName, object: nil)
+    }
+    
+    func sendTrackingDeviceNotification() {
+        NotificationCenter.default.post(name: trackingDeviceNotiName, object: nil)
+    }
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        centralManagerStatus = false
+        switch central.state {
+        case .unknown, .resetting, .unsupported, .unauthorized, .poweredOff:
+            debugPrint("central.state is .unknown")
+            self.deviceBluetoothDeniedBlock?()
+        case .poweredOn:
+            debugPrint("central.state is .poweredOn")
+            self.centralManagerStatus = true
+            centralManagerScan()
+        @unknown default:
+            debugPrint("central.state is .@unknown default")
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        
+        if let deviceName = peripheral.name {
+            if let peItem = peripheralItemList.first(where: { perItem in
+                perItem.identifier == peripheral.identifier.uuidString
+            }) {
+                peItem.rssi = Double(truncating: RSSI)
+                debugPrint("peItem addr = \(peItem)")
+                debugPrint("peItem.rssi = \(peItem.rssi)")
+                
+                if let currentTrack = currentTrackingItem, currentTrack.identifier == peItem.identifier {
+                    currentTrackingItemName = currentTrack.deviceName ?? ""
+                    currentTrackingItemRssi = Double(truncating: RSSI)
+                    
+                    sendTrackingDeviceNotification()
+                }
+            } else {
+                if let peItem = cachaedPeripheralItemList.first(where: { perItem in
+                    perItem.identifier == peripheral.identifier.uuidString
+                }) {
+                    peItem.rssi = Double(truncating: RSSI)
+                    peripheralItemList.append(peItem)
+                } else {
+                    let item = NEwPeripheralItem(identifier: peripheral.identifier.uuidString, deviceName: deviceName, rssi: Double(truncating: RSSI))
+                    peripheralItemList.append(item)
+                }
+            }
+            sendDiscoverDeviceNotification()
+        }
+    }
     
     
 }
-
 
 extension UIFont {
     static let SFProTextRegular = "SFProText-Regular"
@@ -26,13 +238,10 @@ extension UIFont {
     static let SFProTextBold = "SFProText-Bold"
     static let SFProTextHeavy = "SFProText-Heavy"
     
-    
-    
-    
-    
 }
-
-class NEwPeripheralItem: Equatable, NSObject {
+//
+class NEwPeripheralItem: Equatable {
+    
     static func == (lhs: NEwPeripheralItem, rhs: NEwPeripheralItem) -> Bool {
         return lhs.identifier == rhs.identifier
     }
@@ -131,6 +340,14 @@ class NEwPeripheralItem: Equatable, NSObject {
         }
         return iconStr
     }
+    func fetchAboutDistanceString() -> String {
+        let distance = calculateDistance(rssi: Int(rssi))
+        var dis = CGFloat(Int(distance))
+        if dis == 0 {
+            dis = 0.1
+        }
+        return "\(dis) m"
+    }
     
     func fetchDistanceString() -> String {
         
@@ -171,3 +388,6 @@ class NEwPeripheralItem: Equatable, NSObject {
     }
     
 }
+
+
+
