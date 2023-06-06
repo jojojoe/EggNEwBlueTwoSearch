@@ -14,6 +14,8 @@ class NEwSearchingBottomView: UIView {
     var itemclickBlock: ((NEwPeripheralItem)->Void)?
     var refreshWating: Bool = false
     var allDevicePreviewView: [BSiegBlueDeviceSearchingPreview] = []
+    // 在toolManager里添加每个Item的RingProgress 其他的在cell里刷新， searching bottom和 content list里的 RingProgress 公用一个
+    
     var cellSize: CGSize = CGSize.zero
     
     override init(frame: CGRect) {
