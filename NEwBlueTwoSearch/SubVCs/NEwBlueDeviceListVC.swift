@@ -11,7 +11,7 @@ class NEwBlueDeviceListVC: UIViewController {
 
     
     var collection: UICollectionView!
-    var itemclickBlock: ((PeripheralItem)->Void)?
+    var itemclickBlock: ((NEwPeripheralItem)->Void)?
     var searchAgainClickBlock: (()->Void)?
     var refreshWating: Bool = false
     
@@ -32,7 +32,7 @@ class NEwBlueDeviceListVC: UIViewController {
     }
   
     func setupContentV() {
-        backgroundColor = .clear
+        view.backgroundColor = .clear
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         collection = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
@@ -41,47 +41,14 @@ class NEwBlueDeviceListVC: UIViewController {
         collection.backgroundColor = .clear
         collection.delegate = self
         collection.dataSource = self
-        addSubview(collection)
+        view.addSubview(collection)
         collection.snp.makeConstraints {
             $0.top.bottom.right.left.equalToSuperview()
         }
-        collection.register(cellWithClass: BSiegBlueDevicePreviewCell.self)
+        collection.register(cellWithClass: NEwDeviceListCell.self)
         collection.register(supplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withClass: BSiegBlueHeader.self)
         
         
-        //
-        let bottomBar = UIView()
-        addSubview(bottomBar)
-        bottomBar.backgroundColor = .clear
-        bottomBar.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview()
-            $0.height.equalTo(140)
-        }
-        bottomBar.layer.cornerRadius = 30
-        bottomBar.addShadow(ofColor: UIColor(hexString: "#2B2F3C")!, radius: 40, offset: CGSize(width: 0, height: -5), opacity: 0.1)
-        //
-        let bottomBgImgv = UIImageView()
-        bottomBar.addSubview(bottomBgImgv)
-        bottomBgImgv.snp.makeConstraints {
-            $0.left.right.top.bottom.equalToSuperview()
-        }
-        bottomBgImgv.image = UIImage(named: "bottonbgbanner")
-        //
-        let searAginBtn = UIButton()
-        bottomBar.addSubview(searAginBtn)
-        searAginBtn.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.left.equalToSuperview().offset(30)
-            $0.centerY.equalToSuperview()
-            $0.height.equalTo(60)
-        }
-        searAginBtn.backgroundColor = UIColor(hexString: "#3971FF")
-        searAginBtn.layer.cornerRadius = 30
-        searAginBtn.clipsToBounds = true
-        searAginBtn.setTitle("Search Again", for: .normal)
-        searAginBtn.setTitleColor(.white, for: .normal)
-        searAginBtn.titleLabel?.font = UIFont(name: "Poppins-Bold", size: 16)
-        searAginBtn.addTarget(self, action: #selector(searAginBtnClick(sender: )), for: .touchUpInside)
     }
     
     func updateContentDevice() {
@@ -98,7 +65,7 @@ class NEwBlueDeviceListVC: UIViewController {
             
             
             //
-            BSiesBabyBlueManager.default.peripheralItemList.forEach { item in
+            NEwBlueToolManager.default.peripheralItemList.forEach { item in
                 var currenPreview: BSiegBlueDevicePreview!
                 if let pv = allDevicePreviewView.first(where: { prev in
                     prev.peripheralItem == item
@@ -110,24 +77,13 @@ class NEwBlueDeviceListVC: UIViewController {
                 }
                 currenPreview.updateContent()
                 
-                if BSiesBabyBlueManager.default.favoriteDevicesIdList.contains(item.identifier) {
+                if NEwBlueToolManager.default.favoriteDevicesIdList.contains(item.identifier) {
                     myDevicePreviewView.append(currenPreview)
                 } else {
                     otherDevicePreviewView.append(currenPreview)
                 }
             }
             sortedItems()
-            //
-//            myDevicePreviewView = myDevicePreviewView.sorted { item1, item2 in
-//                return item1.peripheralItem.rssi > item2.peripheralItem.rssi
-//            }
-//            otherDevicePreviewView = otherDevicePreviewView.sorted { item1, item2 in
-//                return item1.peripheralItem.rssi > item2.peripheralItem.rssi
-//            }
-//
-//            allDevicePreviewView = myDevicePreviewView + otherDevicePreviewView
-//            collection.reloadData()
-            
             
         }
         
@@ -135,15 +91,15 @@ class NEwBlueDeviceListVC: UIViewController {
     
     func sortedItems() {
         //
-        myDevicePreviewView = myDevicePreviewView.sorted { item1, item2 in
-            return item1.peripheralItem.rssi > item2.peripheralItem.rssi
-        }
-        otherDevicePreviewView = otherDevicePreviewView.sorted { item1, item2 in
-            return item1.peripheralItem.rssi > item2.peripheralItem.rssi
-        }
-        
-        allDevicePreviewView = myDevicePreviewView + otherDevicePreviewView
-        collection.reloadData()
+//        myDevicePreviewView = myDevicePreviewView.sorted { item1, item2 in
+//            return item1.peripheralItem.rssi > item2.peripheralItem.rssi
+//        }
+//        otherDevicePreviewView = otherDevicePreviewView.sorted { item1, item2 in
+//            return item1.peripheralItem.rssi > item2.peripheralItem.rssi
+//        }
+//        
+//        allDevicePreviewView = myDevicePreviewView + otherDevicePreviewView
+//        collection.reloadData()
     }
 
 
@@ -151,11 +107,11 @@ class NEwBlueDeviceListVC: UIViewController {
 
 
 
-extension BSiegBlueDeviceCollectionView: UICollectionViewDataSource {
+extension NEwBlueDeviceListVC: UICollectionViewDataSource {
     
      
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withClass: BSiegBlueDevicePreviewCell.self, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withClass: NEwDeviceListCell.self, for: indexPath)
          
         var preview: BSiegBlueDevicePreview!
         
@@ -189,9 +145,9 @@ extension BSiegBlueDeviceCollectionView: UICollectionViewDataSource {
             DispatchQueue.main.async {
                 if deviceid.count >= 1 {
                     if favoStatus {
-                        BSiesBabyBlueManager.default.addUserFavorite(deviceId: deviceid)
+                        NEwBlueToolManager.default.addUserFavorite(deviceId: deviceid)
                     } else {
-                        BSiesBabyBlueManager.default.removeUserFavorite(deviceId: deviceid)
+                        NEwBlueToolManager.default.removeUserFavorite(deviceId: deviceid)
                     }
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
                         [weak self] in
@@ -239,7 +195,7 @@ extension BSiegBlueDeviceCollectionView: UICollectionViewDataSource {
     
 }
 
-extension BSiegBlueDeviceCollectionView: UICollectionViewDelegateFlowLayout {
+extension NEwBlueDeviceListVC: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         return cellSize
@@ -318,7 +274,7 @@ extension BSiegBlueDeviceCollectionView: UICollectionViewDelegateFlowLayout {
     
 }
 
-extension BSiegBlueDeviceCollectionView: UICollectionViewDelegate {
+extension NEwBlueDeviceListVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         var previewView: BSiegBlueDevicePreview!
@@ -375,7 +331,7 @@ class BSiegBlueHeader: UICollectionReusableView {
 }
 
 class BSiegBlueDevicePreview: UIView {
-    var peripheralItem: PeripheralItem
+    var peripheralItem: NEwPeripheralItem
      
     let contentImgV = UIImageView()
     let deviceNameLabel = UILabel()
@@ -383,7 +339,7 @@ class BSiegBlueDevicePreview: UIView {
     
     var ring1V = RingProgressView()
     
-    init(frame: CGRect, peripheralItem: PeripheralItem) {
+    init(frame: CGRect, peripheralItem: NEwPeripheralItem) {
         self.peripheralItem = peripheralItem
        
         super.init(frame: frame)
@@ -485,7 +441,7 @@ class BSiegBlueDevicePreview: UIView {
     }
 }
 
-class BSiegBlueDevicePreviewCell: PZSwipedCollectionViewCell {
+class NEwDeviceListCell: NEwSwipeCollectionCell {
     var contentBgV = UIView()
     var contentPreview: BSiegBlueDevicePreview!
     var favoButton: UIButton!

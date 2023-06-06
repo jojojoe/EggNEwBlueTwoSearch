@@ -35,6 +35,7 @@
 		D8E76A1B2A2CC375008BD289 /* NEwManualPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1A2A2CC375008BD289 /* NEwManualPageView.swift */; };
 		D8E76A1D2A2CD36E008BD289 /* NEwSearchingBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */; };
 		D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */; };
+		D8E76A232A2F70C3008BD289 /* NEwSwipeCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */; };
 		EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */; };
 		EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */; };
 		EB9E45412A2F251F0068AACB /* NEwBlueDevicePostionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */; };
@@ -74,6 +75,7 @@
 		D8E76A1A2A2CC375008BD289 /* NEwManualPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwManualPageView.swift; sourceTree = "<group>"; };
 		D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSearchingBottomView.swift; sourceTree = "<group>"; };
 		D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKNRingProgressView.swift; sourceTree = "<group>"; };
+		D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSwipeCollectionCell.swift; sourceTree = "<group>"; };
 		D9A85237F94174B73FA55D54 /* Pods-NEwBlueTwoSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NEwBlueTwoSearch.release.xcconfig"; path = "Target Support Files/Pods-NEwBlueTwoSearch/Pods-NEwBlueTwoSearch.release.xcconfig"; sourceTree = "<group>"; };
 		EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDeviceContentVC.swift; sourceTree = "<group>"; };
 		EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDeviceListVC.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 		D8E769D62A2C6ADA008BD289 /* NEwBlueTwoSearch */ = {
 			isa = PBXGroup;
 			children = (
+				D8E76A212A2F70A6008BD289 /* SwipedCollectionCell */,
 				D8E76A1E2A2E2F4F008BD289 /* RingProgress */,
 				D8E76A132A2C994A008BD289 /* PageViews */,
 				D8E76A022A2C86A9008BD289 /* SpeedUILayoutChain */,
@@ -226,6 +229,14 @@
 				D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */,
 			);
 			path = RingProgress;
+			sourceTree = "<group>";
+		};
+		D8E76A212A2F70A6008BD289 /* SwipedCollectionCell */ = {
+			isa = PBXGroup;
+			children = (
+				D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */,
+			);
+			path = SwipedCollectionCell;
 			sourceTree = "<group>";
 		};
 		EB9E453B2A2F24AD0068AACB /* SubVCs */ = {
@@ -371,6 +382,7 @@
 				D8E769F42A2C6D2F008BD289 /* KRHudExtensions.swift in Sources */,
 				D8E769DC2A2C6ADA008BD289 /* ViewController.swift in Sources */,
 				EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */,
+				D8E76A232A2F70C3008BD289 /* NEwSwipeCollectionCell.swift in Sources */,
 				D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */,
 				D8E769D82A2C6ADA008BD289 /* AppDelegate.swift in Sources */,
 				D8E76A1D2A2CD36E008BD289 /* NEwSearchingBottomView.swift in Sources */,
