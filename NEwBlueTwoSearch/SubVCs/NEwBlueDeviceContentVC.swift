@@ -11,6 +11,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     
     let titleDeviceNameLabel = UILabel()
     let backButton = UIButton()
+    let favoriteHotBtn = UIButton()
     let voiceBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_voice_n", selectImgStr: "content_voice_s")
     let vibBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_vib_n", selectImgStr: "content_vib_s")
     let postionBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_postion", selectImgStr: "content_postion")
@@ -105,8 +106,8 @@ class NEwBlueDeviceContentVC: UIViewController {
                 self.refreshWating = false
             }
             //
-            let progress = bluetoothDevice.deviceDistancePercent()
-            let percentStr = bluetoothDevice.deviceDistancePercentStr()
+            let progress = peripheralItem.deviceDistancePercent()
+            let percentStr = peripheralItem.deviceDistancePercentStr()
             ringProgressView.progress = progress
             persentLabel.text = percentStr
             
@@ -120,7 +121,7 @@ class NEwBlueDeviceContentVC: UIViewController {
         if voiceBtn.isSelected == true {
             NEwBlueToolManager.default.playAudio()
         }
-        if vibrationBtn.isSelected == true {
+        if vibBtn.isSelected == true {
             NEwBlueToolManager.default.playFeedVib()
         }
     }
@@ -151,9 +152,9 @@ extension NEwBlueDeviceContentVC {
 extension NEwBlueDeviceContentVC {
     func trackStatusChange(isTracking: Bool) {
         if isTracking {
-            NEwBlueToolManager.default.addUserFavorite(deviceId: bluetoothDevice.identifier)
+            NEwBlueToolManager.default.addUserFavorite(deviceId: peripheralItem.identifier)
         } else {
-            NEwBlueToolManager.default.removeUserFavorite(deviceId: bluetoothDevice.identifier)
+            NEwBlueToolManager.default.removeUserFavorite(deviceId: peripheralItem.identifier)
         }
     }
 }
@@ -247,83 +248,77 @@ extension NEwBlueDeviceContentVC {
             $0.bottom.equalTo(voiceBtn.snp.top).offset(-85)
             $0.width.height.greaterThanOrEqualTo(30)
         }
+        .textAlignment(.center)
+        .color(UIColor(hexString: "#262B55")!)
+        .font(UIFont.SFProTextHeavy, 24)
+        .text("0%")
         
         //
+        infoDescribeLabel
+            .adhere(toSuperview: view) {
+                $0.centerX.equalToSuperview()
+                if NEwBlueToolManager.default.isDevice8SE() {
+                    $0.top.equalTo(persentLabel.snp.bottom).offset(10)
+                } else {
+                    $0.top.equalTo(persentLabel.snp.bottom).offset(24)
+                }
+                
+                $0.width.height.greaterThanOrEqualTo(30)
+            }
+            .textAlignment(.center)
+            .color(UIColor(hexString: "#262B55")!)
+            .font(UIFont.SFProTextHeavy, 24)
         
-        view.addSubview(centerV)
-        centerV.snp.makeConstraints {
+        //
+        centerV.adhere(toSuperview: view) {
             $0.left.right.equalToSuperview()
-            $0.top.equalTo(backB.snp.bottom).offset(10)
-            $0.bottom.equalTo(favoriteBtn.snp.top).offset(-10)
+            $0.top.equalTo(backButton.snp.bottom).offset(10)
+            $0.bottom.equalTo(persentLabel.snp.top).offset(-10)
         }
+        
         
     }
     
     func setupCenterDeviceView() {
         //
+        let leftPadding: CGFloat = 20
+        var canvasVWidth = centerV.bounds.size.width - leftPadding * 2
+        if canvasVWidth > centerV.bounds.size.height {
+            canvasVWidth = centerV.bounds.size.height
+        }
+        //
         let iconbgV = UIView()
-        centerV.addSubview(iconbgV)
-        iconbgV.backgroundColor = UIColor(hexString: "#E8EDFF")
-        iconbgV.snp.makeConstraints {
-            $0.centerY.equalToSuperview().offset(-60)
-            $0.centerX.equalToSuperview()
-            $0.width.height.equalTo(centerV.frame.size.height/2)
+        iconbgV.adhere(toSuperview: centerV) {
+            $0.center.equalToSuperview()
+            $0.width.height.equalTo(canvasVWidth)
         }
-        iconbgV.layer.cornerRadius = centerV.frame.size.height/2/2
-        iconbgV.clipsToBounds = true
         //
-        contentImgV.contentMode = .scaleAspectFit
-        contentImgV.clipsToBounds = true
-        iconbgV.addSubview(contentImgV)
-        contentImgV.snp.makeConstraints {
-            $0.center.equalTo(iconbgV)
-            $0.top.equalToSuperview().offset(30)
-            $0.left.equalToSuperview().offset(30)
+        let iconBgIMgV = UIImageView()
+        iconBgIMgV.adhere(toSuperview: iconbgV) {
+            $0.left.right.top.bottom.equalToSuperview()
         }
-        let iconName = bluetoothDevice.deviceTagIconName()
-        contentImgV.image = UIImage(named: iconName)
+        .image("devicebgblur")
+        .contentMode(.scaleAspectFit)
         
         //
-        
-        iconbgV.addSubview(ring1V)
-        ring1V.frame = CGRect(x: 0, y: 0, width: centerV.frame.size.height/2, height: centerV.frame.size.height/2)
-        ring1V.startColor = UIColor(hexString: "#3971FF")!
-        ring1V.endColor = UIColor(hexString: "#3971FF")!
-        ring1V.ringWidth = 12
-        ring1V.backgroundRingColor = .clear
-        ring1V.hidesRingForZeroProgress = true
-        ring1V.shadowOpacity = 0
-        ring1V.progress = 0
-        
-        
-        //
-        
-//        view.addSubview(distancePersentLabel)
-//        distancePersentLabel.snp.makeConstraints {
-//            $0.top.equalTo(iconbgV.snp.bottom).offset(30)
-//            $0.centerX.equalToSuperview()
-//            $0.width.height.greaterThanOrEqualTo(32)
-//        }
-//
-//        distancePersentLabel.text = bluetoothDevice.deviceDistancePercentStr()
-//        distancePersentLabel.textAlignment = .center
-//        distancePersentLabel.textColor = UIColor(hexString: "#242766")
-//        distancePersentLabel.font = UIFont(name: "Poppins-Bold", size: 32)
-        
-        //
-        let infoLabel = UILabel()
-        view.addSubview(infoLabel)
-        infoLabel.snp.makeConstraints {
-            $0.top.equalTo(distancePersentLabel.snp.bottom).offset(15)
-            $0.centerX.equalToSuperview()
-            $0.height.greaterThanOrEqualTo(32)
-            $0.left.equalToSuperview().offset(28)
+        let iconImgV = UIImageView()
+        iconImgV.adhere(toSuperview: iconbgV) {
+            $0.center.equalToSuperview()
+            $0.width.height.equalTo(canvasVWidth * 2.0/3.0)
         }
-        infoLabel.numberOfLines = 2
-        infoLabel.text = "Move around so that the signal strength increases"
-        infoLabel.textAlignment = .center
-        infoLabel.textColor = UIColor(hexString: "#242766")!.withAlphaComponent(0.5)
-        infoLabel.font = UIFont(name: "Poppins-Medium", size: 14)
+        .image(peripheralItem.deviceTagIconName())
+        //
+        
+        
+        iconbgV.addSubview(ringProgressView)
+        ringProgressView.frame = CGRect(x: 0, y: 0, width: canvasVWidth, height: canvasVWidth)
+        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.ringWidth = 12
+        ringProgressView.backgroundRingColor = .clear
+        ringProgressView.hidesRingForZeroProgress = true
+        ringProgressView.shadowOpacity = 0
+        ringProgressView.progress = 0
         
         
     }
@@ -343,23 +338,15 @@ extension NEwBlueDeviceContentVC {
     }
     
     @objc func founditBtnClick() {
-        backBClick(sender: backB)
+        backBClick()
          
     }
     
     @objc func vibBtnClick() {
-        sender.isSelected = !sender.isSelected
-        if sender.isSelected == true {
-            sender.backgroundColor = UIColor(hexString: "#FF961B")
-            sender.iconImgV.image = UIImage(named: "icon_vibrate_s")
-            sender.nameL.textColor = UIColor(hexString: "#FFFFFF")
-            
+        vibBtn.isSelected = !vibBtn.isSelected
+        if vibBtn.isSelected == true {
             NEwBlueToolManager.default.playFeedVib()
         } else {
-            sender.backgroundColor = UIColor(hexString: "#FFFFFF")
-            sender.iconImgV.image = UIImage(named: "icon_vibrate")
-            sender.nameL.textColor = UIColor(hexString: "#242766")
-            
             NEwBlueToolManager.default.stopVibTimer()
         }
         
@@ -369,7 +356,7 @@ extension NEwBlueDeviceContentVC {
 //        if !NEwBlueToolManager.default.inSubscription {
 //            userSubscriVC()
 //        } else {
-            let vc = NEwBlueDevicePostionVC(bluetoothDevice: bluetoothDevice)
+            let vc = NEwBlueDevicePostionVC(bluetoothDevice: peripheralItem)
             self.navigationController?.pushViewController(vc, animated: true)
 //        }
         
@@ -400,7 +387,8 @@ extension NEwBlueDeviceContentVC {
 class NeEwVoiceBtn: UIButton {
     let iconImgV = UIImageView()
     let nameL = UILabel()
-    
+    var norImgStr: String
+    var selectImgStr: String
     override var isSelected: Bool {
         didSet {
             iconImgV.isHighlighted = isSelected
@@ -408,6 +396,9 @@ class NeEwVoiceBtn: UIButton {
     }
     
     init(frame: CGRect, norImgStr: String, selectImgStr: String) {
+        self.norImgStr = norImgStr
+        self.selectImgStr = selectImgStr
+        
         super.init(frame: frame)
         setupV()
     }
@@ -440,7 +431,7 @@ class NeEwVoiceBtn: UIButton {
             .textAlignment(.center)
             .lineBreakMode(.byTruncatingTail)
             .numberOfLines(1)
-            .color(UIColor(hexString: "#262B55"))
+            .color(UIColor(hexString: "#262B55")!)
             .font(UIFont.SFProTextMedium, 14)
   
         

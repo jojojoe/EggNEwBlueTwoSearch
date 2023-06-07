@@ -115,7 +115,6 @@ extension NEwSearchingBottomView: UICollectionViewDataSource {
         let preitem = NEwBlueToolManager.default.peripheralItemList[indexPath.item]
         cell.updateItemContentStatus(peripheralItem: preitem)
         
-        
         return cell
     }
     
