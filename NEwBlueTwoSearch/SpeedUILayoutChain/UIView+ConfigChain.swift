@@ -108,6 +108,12 @@ public extension UIImageView {
         image = UIImage(named: value)
         return self
     }
+    func highlightedImage(_ value: String?, _: Bool = false) -> Self {
+        guard let value = value else { return self }
+        highlightedImage = UIImage(named: value)
+        return self
+    }
+    
     
     func image(_ valueImg: UIImage?) -> Self {
         guard let valueImg = valueImg else { return self }

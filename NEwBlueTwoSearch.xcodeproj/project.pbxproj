@@ -120,6 +120,7 @@
 				5250314D8FE73D97209F30A6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		D8E769D52A2C6ADA008BD289 /* Products */ = {
 			isa = PBXGroup;

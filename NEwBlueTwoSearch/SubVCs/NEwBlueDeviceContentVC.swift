@@ -8,33 +8,33 @@
 import UIKit
 
 class NEwBlueDeviceContentVC: UIViewController {
-    var fatherVC: ViewController!
-    let tiNameLabel = UILabel()
-    let backB = UIButton()
-    let vibrationBtn = BSiegToolBtn()
-    let positionBtn = BSiegToolBtn()
-    let favoriteBtn = BSiegToolBtn()
-    let voiceBtn = BSiegToolBtn()
+    
+    let titleDeviceNameLabel = UILabel()
+    let backButton = UIButton()
+    let voiceBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_voice_n", selectImgStr: "content_voice_s")
+    let vibBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_vib_n", selectImgStr: "content_vib_s")
+    let postionBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_postion", selectImgStr: "content_postion")
+    
+    var peripheralItem: NEwPeripheralItem
+    
     let centerV = UIView()
     let contentImgV = UIImageView()
-    var bluetoothDevice: NEwPeripheralItem
+    let persentLabel = UILabel()
+    let infoDescribeLabel = UILabel()
+    var ringProgressView = RingProgressView()
     let didlayoutOnce: Once = Once()
-    let distancePersentLabel = UILabel()
-    var ring1V = RingProgressView()
     
-    let testinfoLabel = UILabel()
-    
+//    let testinfoLabel = UILabel()
     var refreshWating: Bool = false
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .darkContent
     }
     
-    init(bluetoothDevice: NEwPeripheralItem) {
-        self.bluetoothDevice = bluetoothDevice
-        NEwBlueToolManager.default.currentTrackingItem = bluetoothDevice
+    init(peripheral: NEwPeripheralItem) {
+        self.peripheralItem = peripheral
+        NEwBlueToolManager.default.currentTrackingItem = peripheral
         super.init(nibName: nil, bundle: nil)
-        
     }
     
     required init?(coder: NSCoder) {
@@ -45,6 +45,7 @@ class NEwBlueDeviceContentVC: UIViewController {
         super.viewDidLoad()
 
         setupV()
+        
         updateFavoriteStatus()
         
         if !NEwBlueToolManager.default.centralManager.isScanning {
@@ -52,91 +53,6 @@ class NEwBlueDeviceContentVC: UIViewController {
         }
         
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        addNoti()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        removeNoti()
-    }
-    
-    deinit {
-        removeNoti()
-    }
-    
-    func updatePositionPersent() {
-        
-        if !refreshWating {
-            refreshWating = true
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                [weak self] in
-                guard let `self` = self else {return}
-                self.refreshWating = false
-            }
-            
-            //
-            let progress = bluetoothDevice.deviceDistancePercent()
-            let percentStr = bluetoothDevice.deviceDistancePercentStr()
-            ring1V.progress = progress
-            distancePersentLabel.text = percentStr
-            testinfoLabel.adjustsFontSizeToFitWidth = true
-
-//
-//            debugPrint("update ring1V.progress: \(progress) distancePersentLabel - \(percentStr)")
-//            debugPrint("currentTrackingItemRssi \(NEwBlueToolManager.default.currentTrackingItemRssi) currentTrackingItemName - \(NEwBlueToolManager.default.currentTrackingItemName)")
-            
-            //
-            if voiceBtn.isSelected == true {
-                NEwBlueToolManager.default.playAudio()
-            } else {
-                NEwBlueToolManager.default.stopAudio()
-            }
-            if vibrationBtn.isSelected == true {
-                NEwBlueToolManager.default.playFeedVib()
-            } else {
-                NEwBlueToolManager.default.stopVibTimer()
-            }
-        }
-        
-        
-        
-        
-    }
-    
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        if centerV.bounds.size.width == UIScreen.main.bounds.size.width {
-            didlayoutOnce.run {
-                setupCenterDeviceView()
-            }
-        }
-
-    }
-    
-    func updateFavoriteStatus() {
-        if NEwBlueToolManager.default.favoriteDevicesIdList.contains(bluetoothDevice.identifier) {
-            favoriteBtn.isSelected = true
-            favoriteBtn.iconImgV.image = UIImage(named: "icon_heart_s")
-        } else {
-            favoriteBtn.isSelected = false
-            favoriteBtn.iconImgV.image = UIImage(named: "icon_heart")
-        }
-        
-    }
-
-    func userSubscriVC() {
-//        let subsVC = BSiegDeSubscVC()
-//        subsVC.modalPresentationStyle = .fullScreen
-//        self.present(subsVC, animated: true)
-    }
-    
-}
-
-extension NEwBlueDeviceContentVC {
     
     func addNoti() {
         NotificationCenter.default.addObserver(self, selector:#selector(discoverDeviceUpdate(notification:)) , name: NEwBlueToolManager.default.trackingDeviceNotiName, object: nil)
@@ -155,6 +71,80 @@ extension NEwBlueDeviceContentVC {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        addNoti()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        removeNoti()
+    }
+    
+    deinit {
+        removeNoti()
+    }
+    
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if centerV.bounds.size.width == UIScreen.main.bounds.size.width {
+            didlayoutOnce.run {
+                setupCenterDeviceView()
+            }
+        }
+    }
+    
+    func updatePositionPersent() {
+        
+        if !refreshWating {
+            refreshWating = true
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+                [weak self] in
+                guard let `self` = self else {return}
+                self.refreshWating = false
+            }
+            //
+            let progress = bluetoothDevice.deviceDistancePercent()
+            let percentStr = bluetoothDevice.deviceDistancePercentStr()
+            ringProgressView.progress = progress
+            persentLabel.text = percentStr
+            
+            checkVoiceVibStatus()
+            
+        }
+        
+    }
+    
+    func checkVoiceVibStatus() {
+        if voiceBtn.isSelected == true {
+            NEwBlueToolManager.default.playAudio()
+        }
+        if vibrationBtn.isSelected == true {
+            NEwBlueToolManager.default.playFeedVib()
+        }
+    }
+    
+    
+    func updateFavoriteStatus() {
+        if NEwBlueToolManager.default.favoriteDevicesIdList.contains(peripheralItem.identifier) {
+            favoriteHotBtn.isSelected = true
+        } else {
+            favoriteHotBtn.isSelected = false
+        }
+        
+    }
+
+    func userSubscriVC() {
+//        let subsVC = BSiegDeSubscVC()
+//        subsVC.modalPresentationStyle = .fullScreen
+//        self.present(subsVC, animated: true)
+    }
+    
+}
+
+extension NEwBlueDeviceContentVC {
+    
     
 }
 
@@ -165,130 +155,99 @@ extension NEwBlueDeviceContentVC {
         } else {
             NEwBlueToolManager.default.removeUserFavorite(deviceId: bluetoothDevice.identifier)
         }
-//        updateFavoriteStatus()
     }
 }
+
+
 
 extension NEwBlueDeviceContentVC {
     func setupV() {
         view.clipsToBounds = true
-        //
-        let bgImgV = UIImageView()
-        view.addSubview(bgImgV)
-        bgImgV.image = UIImage(named: "home")
-        bgImgV.snp.makeConstraints {
-            $0.left.right.top.bottom.equalToSuperview()
-        }
-        
-        //
-        
-        view.addSubview(backB)
-        backB.snp.makeConstraints {
+         
+        backButton.adhere(toSuperview: view) {
             $0.left.equalToSuperview().offset(20)
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.width.height.equalTo(44)
         }
-        backB.setImage(UIImage(named: "nav_back"), for: .normal)
-        backB.addTarget(self, action: #selector(backBClick(sender: )), for: .touchUpInside)
-        
+        .image(UIImage(named: "back_ic"))
+        .target(target: self, action: #selector(backBClick), event: .touchUpInside)
         //
+        titleDeviceNameLabel.adhere(toSuperview: view) {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalTo(backButton.snp.centerY)
+            $0.left.equalTo(backButton.snp.right).offset(10)
+            $0.height.equalTo(44)
+        }
+        .lineBreakMode(.byTruncatingTail)
+        .text(peripheralItem.deviceName)
+        .color(UIColor(hexString: "#242766")!)
+        .font(UIFont.SFProTextBold, 22)
+        .textAlignment(.center)
         
-        view.addSubview(tiNameLabel)
-        tiNameLabel.snp.makeConstraints {
-            $0.left.equalTo(backB.snp.right).offset(20)
-            $0.centerY.equalTo(backB.snp.centerY).offset(0)
+        favoriteHotBtn.adhere(toSuperview: view) {
             $0.right.equalToSuperview().offset(-20)
-            $0.height.greaterThanOrEqualTo(17)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
+            $0.width.height.equalTo(44)
         }
-        tiNameLabel.lineBreakMode = .byTruncatingTail
-        tiNameLabel.text = bluetoothDevice.deviceName
-        tiNameLabel.textAlignment = .center
-        tiNameLabel.textColor = UIColor(hexString: "#242766")
-        tiNameLabel.font = UIFont(name: "Poppins-Bold", size: 24)
-        
-        
-        view.addSubview(testinfoLabel)
-        testinfoLabel.snp.makeConstraints {
-            $0.left.equalTo(backB.snp.right).offset(20)
-            $0.top.equalTo(tiNameLabel.snp.bottom).offset(0)
-            $0.centerX.equalToSuperview()
-            $0.height.greaterThanOrEqualTo(17)
-        }
-        testinfoLabel.lineBreakMode = .byTruncatingTail
-        testinfoLabel.text = ""
-        testinfoLabel.textAlignment = .center
-        testinfoLabel.textColor = UIColor(hexString: "#242766")
-        testinfoLabel.font = UIFont(name: "Poppins-Medium", size: 24)
-        
+        .image(UIImage(named: "Heart_ic"), .normal)
+        .image(UIImage(named: "Heart_s"), .selected)
+        .target(target: self, action: #selector(favoriteBtnClick(sender: )), event: .touchUpInside)
         
         //
-        let founditBtn = UIButton()
-        view.addSubview(founditBtn)
-        founditBtn.snp.makeConstraints {
+        let foundBtn = UIButton()
+        foundBtn.adhere(toSuperview: view) {
             $0.centerX.equalToSuperview()
-            $0.left.equalToSuperview().offset(30)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-10)
+            $0.bottom.equalToSuperview().offset(-25)
+            $0.width.equalTo(326)
             $0.height.equalTo(60)
         }
-        founditBtn.backgroundColor = UIColor(hexString: "#3971FF")
-        founditBtn.layer.cornerRadius = 30
-        founditBtn.clipsToBounds = true
-        founditBtn.setTitle("I Found It!", for: .normal)
-        founditBtn.setTitleColor(.white, for: .normal)
-        founditBtn.titleLabel?.font = UIFont(name: "Poppins-Bold", size: 16)
-        founditBtn.addTarget(self, action: #selector(founditBtnClick(sender: )), for: .touchUpInside)
+        .backgroundImage(UIImage(named: ""))
+        .title("I Found It")
+        .titleColor(UIColor.white)
+        .font(UIFont.SFProTextBold, 16)
+        .cornerRadius(30)
+        .target(target: self, action: #selector(founditBtnClick), event: .touchUpInside)
         
         //
         let wid: CGFloat = (UIScreen.main.bounds.size.width - 22 * 2 - 15)/2
         let hei: CGFloat = (106.0/164.0) * wid
         //
-
-        view.addSubview(vibrationBtn)
-        vibrationBtn.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(22)
-            $0.bottom.equalTo(founditBtn.snp.top).offset(-30)
-            $0.width.equalTo(wid)
-            $0.height.equalTo(hei)
+      
+        voiceBtn.adhere(toSuperview: view) {
+            $0.left.equalTo(foundBtn.snp.left)
+            $0.width.equalTo(80)
+            $0.height.equalTo(109)
+            if NEwBlueToolManager.default.isDevice8SE() {
+                $0.bottom.equalTo(foundBtn.snp.top).offset(-10)
+            } else {
+                $0.bottom.equalTo(foundBtn.snp.top).offset(-40)
+            }
         }
-        vibrationBtn.iconImgV.image = UIImage(named: "icon_vibrate")
-        vibrationBtn.nameL.text = "Vibration"
-        vibrationBtn.addTarget(self, action: #selector(vibrationBtnClick(sender: )), for: .touchUpInside)
+        .target(target: self, action: #selector(voiceBtnClick), event: .touchUpInside)
+        //
+        vibBtn.adhere(toSuperview: view) {
+            $0.centerX.equalTo(foundBtn.snp.centerX)
+            $0.width.equalTo(80)
+            $0.height.equalTo(109)
+            $0.centerY.equalTo(voiceBtn.snp.centerY)
+        }
+        .target(target: self, action: #selector(vibBtnClick), event: .touchUpInside)
         
         //
-        view.addSubview(positionBtn)
-        positionBtn.snp.makeConstraints {
-            $0.right.equalToSuperview().offset(-22)
-            $0.bottom.equalTo(founditBtn.snp.top).offset(-30)
-            $0.width.equalTo(wid)
-            $0.height.equalTo(hei)
+        postionBtn.adhere(toSuperview: view) {
+            $0.right.equalTo(foundBtn.snp.right)
+            $0.width.equalTo(80)
+            $0.height.equalTo(109)
+            $0.centerY.equalTo(voiceBtn.snp.centerY)
         }
-        positionBtn.iconImgV.image = UIImage(named: "icon_mapPin")
-        positionBtn.nameL.text = "Position"
-        positionBtn.addTarget(self, action: #selector(positionBtnClick(sender: )), for: .touchUpInside)
+        .target(target: self, action: #selector(positionBtnClick), event: .touchUpInside)
         //
-
-        view.addSubview(favoriteBtn)
-        favoriteBtn.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(22)
-            $0.bottom.equalTo(vibrationBtn.snp.top).offset(-15)
-            $0.width.equalTo(wid)
-            $0.height.equalTo(hei)
+        persentLabel.adhere(toSuperview: view) {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(voiceBtn.snp.top).offset(-85)
+            $0.width.height.greaterThanOrEqualTo(30)
         }
-        favoriteBtn.iconImgV.image = UIImage(named: "icon_heart")
-        favoriteBtn.nameL.text = "Favourite"
-        favoriteBtn.addTarget(self, action: #selector(favoriteBtnClick(sender: )), for: .touchUpInside)
-        //
         
-        view.addSubview(voiceBtn)
-        voiceBtn.snp.makeConstraints {
-            $0.right.equalToSuperview().offset(-22)
-            $0.bottom.equalTo(positionBtn.snp.top).offset(-15)
-            $0.width.equalTo(wid)
-            $0.height.equalTo(hei)
-        }
-        voiceBtn.iconImgV.image = UIImage(named: "icon_voice")
-        voiceBtn.nameL.text = "Voice"
-        voiceBtn.addTarget(self, action: #selector(voiceBtnClick(sender: )), for: .touchUpInside)
         //
         
         view.addSubview(centerV)
@@ -339,17 +298,17 @@ extension NEwBlueDeviceContentVC {
         
         //
         
-        view.addSubview(distancePersentLabel)
-        distancePersentLabel.snp.makeConstraints {
-            $0.top.equalTo(iconbgV.snp.bottom).offset(30)
-            $0.centerX.equalToSuperview()
-            $0.width.height.greaterThanOrEqualTo(32)
-        }
-        
-        distancePersentLabel.text = bluetoothDevice.deviceDistancePercentStr()
-        distancePersentLabel.textAlignment = .center
-        distancePersentLabel.textColor = UIColor(hexString: "#242766")
-        distancePersentLabel.font = UIFont(name: "Poppins-Bold", size: 32)
+//        view.addSubview(distancePersentLabel)
+//        distancePersentLabel.snp.makeConstraints {
+//            $0.top.equalTo(iconbgV.snp.bottom).offset(30)
+//            $0.centerX.equalToSuperview()
+//            $0.width.height.greaterThanOrEqualTo(32)
+//        }
+//
+//        distancePersentLabel.text = bluetoothDevice.deviceDistancePercentStr()
+//        distancePersentLabel.textAlignment = .center
+//        distancePersentLabel.textColor = UIColor(hexString: "#242766")
+//        distancePersentLabel.font = UIFont(name: "Poppins-Bold", size: 32)
         
         //
         let infoLabel = UILabel()
@@ -370,7 +329,7 @@ extension NEwBlueDeviceContentVC {
     }
     
     
-    @objc func backBClick(sender: UIButton) {
+    @objc func backBClick() {
         
         NEwBlueToolManager.default.stopAudio()
         NEwBlueToolManager.default.stopVibTimer()
@@ -383,12 +342,12 @@ extension NEwBlueDeviceContentVC {
         }
     }
     
-    @objc func founditBtnClick(sender: UIButton) {
+    @objc func founditBtnClick() {
         backBClick(sender: backB)
          
     }
     
-    @objc func vibrationBtnClick(sender: BSiegToolBtn) {
+    @objc func vibBtnClick() {
         sender.isSelected = !sender.isSelected
         if sender.isSelected == true {
             sender.backgroundColor = UIColor(hexString: "#FF961B")
@@ -406,7 +365,7 @@ extension NEwBlueDeviceContentVC {
         
     }
     
-    @objc func positionBtnClick(sender: BSiegToolBtn) {
+    @objc func positionBtnClick() {
 //        if !NEwBlueToolManager.default.inSubscription {
 //            userSubscriVC()
 //        } else {
@@ -416,44 +375,39 @@ extension NEwBlueDeviceContentVC {
         
     }
     
-    @objc func favoriteBtnClick(sender: BSiegToolBtn) {
+    @objc func favoriteBtnClick(sender: UIButton) {
         sender.isSelected = !sender.isSelected
         if sender.isSelected == true {
-            sender.iconImgV.image = UIImage(named: "icon_heart_s")
             trackStatusChange(isTracking: true)
         } else {
-            sender.iconImgV.image = UIImage(named: "icon_heart")
             trackStatusChange(isTracking: false)
         }
         
     }
     
-    @objc func voiceBtnClick(sender: BSiegToolBtn) {
-//        if !NEwBlueToolManager.default.inSubscription {
-//            userSubscriVC()
-//        } else {
-            sender.isSelected = !sender.isSelected
-            if sender.isSelected == true {
-                sender.backgroundColor = UIColor(hexString: "#3971FF")
-                sender.iconImgV.image = UIImage(named: "icon_voice_s")
-                sender.nameL.textColor = UIColor(hexString: "#FFFFFF")
+    @objc func voiceBtnClick() {
+
+            voiceBtn.isSelected = !voiceBtn.isSelected
+            if voiceBtn.isSelected == true {
                 NEwBlueToolManager.default.playAudio()
             } else {
-                sender.backgroundColor = UIColor(hexString: "#FFFFFF")
-                sender.iconImgV.image = UIImage(named: "icon_voice")
-                sender.nameL.textColor = UIColor(hexString: "#242766")
                 NEwBlueToolManager.default.stopAudio()
             }
-//        }
     }
     
 }
 
-class BSiegToolBtn: UIButton {
+class NeEwVoiceBtn: UIButton {
     let iconImgV = UIImageView()
     let nameL = UILabel()
     
-    override init(frame: CGRect) {
+    override var isSelected: Bool {
+        didSet {
+            iconImgV.isHighlighted = isSelected
+        }
+    }
+    
+    init(frame: CGRect, norImgStr: String, selectImgStr: String) {
         super.init(frame: frame)
         setupV()
     }
@@ -463,33 +417,32 @@ class BSiegToolBtn: UIButton {
     }
     
     func setupV() {
-        backgroundColor = .white
-        layer.cornerRadius = 24
-        clipsToBounds = true
-        //
-        addSubview(iconImgV)
-        iconImgV.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(snp.centerY).offset(0)
-            $0.width.height.equalTo(30)
-        }
-        iconImgV.contentMode = .scaleAspectFit
-        //
+        backgroundColor = .clear
         
-        addSubview(nameL)
-        nameL.snp.makeConstraints {
-            $0.left.equalTo(self.snp.left).offset(20)
-            $0.top.equalTo(iconImgV.snp.bottom).offset(10)
-//            $0.bottom.equalToSuperview().offset(-5)
-            $0.height.greaterThanOrEqualTo(10)
+        clipsToBounds = true
+        iconImgV.adhere(toSuperview: self) {
             $0.centerX.equalToSuperview()
-            
+            $0.top.equalTo(snp.top).offset(0)
+            $0.width.height.equalTo(80)
         }
-        nameL.textAlignment = .center
-        nameL.numberOfLines = 1
-        nameL.lineBreakMode = .byTruncatingTail
-        nameL.textColor = UIColor(hexString: "#242766")
-        nameL.font = UIFont(name: "Poppins-Medium", size: 15)
+        .image(norImgStr)
+        .highlightedImage(selectImgStr)
+        .contentMode(.scaleAspectFit)
+        
+        //
+        nameL
+            .adhere(toSuperview: self) {
+                $0.centerX.equalToSuperview()
+                $0.top.equalTo(iconImgV.snp.bottom).offset(12)
+                $0.height.equalTo(17)
+                $0.width.greaterThanOrEqualTo(10)
+            }
+            .textAlignment(.center)
+            .lineBreakMode(.byTruncatingTail)
+            .numberOfLines(1)
+            .color(UIColor(hexString: "#262B55"))
+            .font(UIFont.SFProTextMedium, 14)
+  
         
         
     }

@@ -16,6 +16,9 @@ class NEwBlueToolManager: NSObject {
     static let `default` = NEwBlueToolManager()
     var centralManager: CBCentralManager!
     var peripheralItemList: [NEwPeripheralItem] = []
+    var favoritePeripheralItemList: [NEwPeripheralItem] = []
+    var otherPeripheralItemList: [NEwPeripheralItem] = []
+    
     var cachaedPeripheralItemList: [NEwPeripheralItem] = []
     let queue = DispatchQueue(label: "fetchqueue", qos: .background)
     var deviceBluetoothDeniedBlock: (()->Void)?
@@ -23,6 +26,7 @@ class NEwBlueToolManager: NSObject {
     var centralManagerStatus: Bool?
     let discoverDeviceNotiName: NSNotification.Name = NSNotification.Name.init("not_ScaningDeviceUpdate")
     let trackingDeviceNotiName: NSNotification.Name = NSNotification.Name.init("trackingDeviceUpdate")
+    let deviceFavoriteChangeNotiName: NSNotification.Name = NSNotification.Name.init("deviceFavoriteChange")
     var currentTrackingItem: NEwPeripheralItem?
     var currentTrackingItemRssi: Double?
     var currentTrackingItemName: String?
@@ -33,7 +37,7 @@ class NEwBlueToolManager: NSObject {
     var audioPlayer: AVAudioPlayer?
     var currentAudioType: String?
     var feedTimer: Timer?
-    
+    var pendingRefresh = false
     
     
     override init() {
@@ -69,9 +73,26 @@ class NEwBlueToolManager: NSObject {
     }
     
     func addUserFavorite(deviceId: String) {
-        favoriteDevicesIdList.append(deviceId)
-        UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
-        UserDefaults.standard.synchronize()
+        if !favoriteDevicesIdList.contains(deviceId) {
+            favoriteDevicesIdList.append(deviceId)
+            UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
+            UserDefaults.standard.synchronize()
+            
+            let peri = peripheralItemList.first { ite in
+                ite.identifier == deviceId
+            }
+          
+            if let item = peri {
+                if !favoritePeripheralItemList.contains(item) {
+                    favoritePeripheralItemList.append(item)
+                }
+                if otherPeripheralItemList.contains(item) {
+                    otherPeripheralItemList.removeAll(item)
+                }
+            }
+            
+            senddeviceFavoriteChangeNotification()
+        }
     }
     
     func removeUserFavorite(deviceId: String) {
@@ -81,6 +102,31 @@ class NEwBlueToolManager: NSObject {
             }
             UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
             UserDefaults.standard.synchronize()
+            
+            let peri = peripheralItemList.first { ite in
+                ite.identifier == deviceId
+            }
+          
+            if let item = peri {
+                if !otherPeripheralItemList.contains(item) {
+                    otherPeripheralItemList.append(item)
+                }
+                if favoritePeripheralItemList.contains(item) {
+                    favoritePeripheralItemList.removeAll(item)
+                }
+            }
+            
+            senddeviceFavoriteChangeNotification()
+        }
+    }
+}
+
+extension NEwBlueToolManager {
+    func isDevice8SE() -> Bool {
+        if Device.current.diagonal <= 4.7 || Device.current.diagonal >= 7.0 {
+            return true
+        } else {
+            return false
         }
     }
 }
@@ -182,6 +228,10 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
         NotificationCenter.default.post(name: trackingDeviceNotiName, object: nil)
     }
     
+    func senddeviceFavoriteChangeNotification() {
+        NotificationCenter.default.post(name: deviceFavoriteChangeNotiName, object: nil)
+    }
+    
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         centralManagerStatus = false
         switch central.state {
@@ -210,7 +260,6 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
                 if let currentTrack = currentTrackingItem, currentTrack.identifier == peItem.identifier {
                     currentTrackingItemName = currentTrack.deviceName ?? ""
                     currentTrackingItemRssi = Double(truncating: RSSI)
-                    
                     sendTrackingDeviceNotification()
                 }
             } else {
@@ -224,8 +273,39 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
                     peripheralItemList.append(item)
                 }
             }
-            sendDiscoverDeviceNotification()
+            
+            //
+            if !pendingRefresh {
+                pendingRefresh = true
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+                    [weak self] in
+                    guard let `self` = self else {return}
+                    self.pendingRefresh = false
+                    self.sortPeripheraByRSSI()
+                    self.sendDiscoverDeviceNotification()
+                }
+            }
         }
+    }
+    
+    func sortPeripheraByRSSI() {
+        peripheralItemList.sort { perip1, perip2 in
+            perip1.rssi > perip2.rssi
+        }
+        var favoriteList: [NEwPeripheralItem] = []
+        var otherList: [NEwPeripheralItem] = []
+        peripheralItemList.forEach {
+            $0.updateRingProgress()
+            if self.favoriteDevicesIdList.contains($0.identifier) {
+                favoriteList.append($0)
+            } else {
+                otherList.append($0)
+            }
+        }
+        
+        favoritePeripheralItemList = favoriteList
+        otherPeripheralItemList = otherList
+        
     }
     
     
@@ -249,11 +329,26 @@ class NEwPeripheralItem: Equatable {
     var identifier: String
     var deviceName: String
     var rssi: Double
+    var ringProgressView: RingProgressView = RingProgressView()
+    
+    func updateRingProgress() {
+        ringProgressView.progress = deviceDistancePercent()
+    }
     
     init(identifier: String, deviceName: String, rssi: Double) {
         self.identifier = identifier
         self.deviceName = deviceName
         self.rssi = rssi
+        //
+        ringProgressView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        ringProgressView.progress = deviceDistancePercent()
+        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.backgroundRingColor = .clear
+        ringProgressView.ringWidth = 3
+        ringProgressView.shadowOpacity = 0
+        ringProgressView.hidesRingForZeroProgress = true
+        
     }
     
     func deviceDistancePercent() -> Double {
