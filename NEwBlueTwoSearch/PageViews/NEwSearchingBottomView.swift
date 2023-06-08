@@ -228,11 +228,11 @@ class NEwSearchingItemCell: UICollectionViewCell {
     func updateItemContentStatus(peripheralItem: NEwPeripheralItem) {
         self.peripheralItem = peripheralItem
         let deviceNameStr = peripheralItem.deviceName
-        let deviceIconStr = peripheralItem.deviceTagIconName(isSmall: true)
+        
+        let deviceIconStr = peripheralItem.deviceTagIconName(isBig: false)
         let distancePercent = peripheralItem.deviceDistancePercent()
         let distanceAboutM = peripheralItem.fetchAboutDistanceString()
         //
-        
         deviceIconImgV.image = UIImage(named: deviceIconStr)
         deviceNameLabel.text = deviceNameStr
         distanceLabel.text = distanceAboutM
@@ -245,95 +245,3 @@ class NEwSearchingItemCell: UICollectionViewCell {
     }
     
 }
-
-//class BSiegBlueDeviceSearchingPreview: UIView {
-//
-//
-//
-////    var ringProgressView = RingProgressView()
-//
-//    init(frame: CGRect, peripheralItem: NEwPeripheralItem) {
-//        self.peripheralItem = peripheralItem
-//        super.init(frame: frame)
-//        setupView()
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    func setupView() {
-//        self.backgroundColor = .white
-//        self.layer.cornerRadius = 10
-//        //
-//        let iconbgV = UIView()
-//        addSubview(iconbgV)
-//        iconbgV.backgroundColor = UIColor(hexString: "#E8EDFF")
-//        iconbgV.snp.makeConstraints {
-//            $0.centerY.equalToSuperview()
-//            $0.left.equalToSuperview().offset(15)
-//            $0.width.height.equalTo(48)
-//        }
-//        iconbgV.layer.cornerRadius = 24
-//        iconbgV.clipsToBounds = true
-//        //
-//        deviceIconImgV.contentMode = .scaleAspectFit
-//        deviceIconImgV.clipsToBounds = true
-//        iconbgV.addSubview(deviceIconImgV)
-//        deviceIconImgV.snp.makeConstraints {
-//            $0.center.equalTo(iconbgV)
-//            $0.width.height.equalTo(32)
-//        }
-//        //
-////        iconbgV.addSubview(ringProgressView)
-////        ringProgressView.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
-////        ringProgressView.progress = 0
-////        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
-////        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
-////        ringProgressView.backgroundRingColor = .clear
-////        ringProgressView.ringWidth = 3
-////        ringProgressView.shadowOpacity = 0
-////        ringProgressView.hidesRingForZeroProgress = true
-//
-//        //
-//        deviceNameLabel.font = UIFont(name: "Poppins-Bold", size: 14)
-//        deviceNameLabel.textColor = UIColor(hexString: "#242766")
-//        deviceNameLabel.lineBreakMode = .byTruncatingTail
-//        deviceNameLabel.numberOfLines = 2
-//        deviceNameLabel.textAlignment = .center
-//        addSubview(deviceNameLabel)
-//        deviceNameLabel.snp.makeConstraints {
-//            $0.centerX.equalToSuperview()
-//            $0.top.equalTo(iconbgV.snp.bottom).offset(4)
-//            $0.bottom.equalToSuperview().offset(-25)
-//            $0.left.equalToSuperview().offset(10)
-//        }
-//
-//        //
-//        addSubview(distanceLabel)
-//        distanceLabel.font = UIFont(name: "Poppins-Medium", size: 12)
-//        distanceLabel.textColor = UIColor(hexString: "#242766")?.withAlphaComponent(0.5)
-//        distanceLabel.adjustsFontSizeToFitWidth = true
-//        distanceLabel.textAlignment = .center
-//        distanceLabel.snp.makeConstraints {
-//            $0.centerX.equalToSuperview()
-//            $0.top.equalTo(deviceNameLabel.snp.bottom)
-//            $0.bottom.equalToSuperview()
-//            $0.left.equalToSuperview().offset(10)
-//        }
-//
-//    }
-//
-//    func updateItemContentStatus() {
-//
-//        let deviceNameStr = peripheralItem.deviceName
-//        let deviceIconStr = peripheralItem.deviceTagIconName(isSmall: true)
-//        let distancePercent = peripheralItem.deviceDistancePercent()
-//        let distanceAboutM = peripheralItem.fetchAboutDistanceString()
-//        //
-//        ringProgressView.progress = distancePercent
-//        deviceIconImgV.image = UIImage(named: deviceIconStr)
-//        deviceNameLabel.text = deviceNameStr
-//        distanceLabel.text = distanceAboutM
-//    }
-//}

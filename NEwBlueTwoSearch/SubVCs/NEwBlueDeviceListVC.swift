@@ -506,7 +506,7 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
     func updateItemContentStatus(peripheralItem: NEwPeripheralItem) {
         self.peripheralItem = peripheralItem
         let deviceNameStr = peripheralItem.deviceName
-        let deviceIconStr = peripheralItem.deviceTagIconName(isSmall: true)
+        let deviceIconStr = peripheralItem.deviceTagIconName(isBig: false)
         let distancePercent = peripheralItem.deviceDistancePercent()
         let distanceAboutM = peripheralItem.fetchAboutDistanceString()
         let distanceAproxStr = "Approx. \(distanceAboutM) away from you"

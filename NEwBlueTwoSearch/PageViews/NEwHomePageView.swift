@@ -8,9 +8,9 @@
 import UIKit
 
 class NEwHomePageView: UIView {
-
+    var fatherFuVC: UIViewController?
     var startScanBlock: (()->Void)?
-    var proClickBlock: (()->Void)?
+    
     
     
     override init(frame: CGRect) {
@@ -91,13 +91,27 @@ class NEwHomePageView: UIView {
     }
     
     @objc func probtnClick() {
-        proClickBlock?()
+        if let fvc = fatherFuVC {
+            NEwBlueToolManager.default.showOpenSubscribeProVC(fuVC: fvc)
+        }
     }
     
     @objc func tapStartScanClick() {
         startScanBlock?()
+//        
+//        if NEwBlueToolManager.default.centralManagerStatus == true {
+//            showSearchingBanner(isShow: true)
+//            BSiesBabyBlueManager.default.peripheralItemList = []
+//            BSiesBabyBlueManager.default.startScan()
+//        } else {
+//            showBluetoothDeniedAlertV()
+//        }
     }
 
+}
+
+extension NEwHomePageView {
+    showSearchingBanner
 }
 
 

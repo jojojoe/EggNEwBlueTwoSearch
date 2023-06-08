@@ -306,7 +306,7 @@ extension NEwBlueDeviceContentVC {
             $0.center.equalToSuperview()
             $0.width.height.equalTo(canvasVWidth * 2.0/3.0)
         }
-        .image(peripheralItem.deviceTagIconName())
+        .image(peripheralItem.deviceTagIconName(isBig: true))
         //
         
         

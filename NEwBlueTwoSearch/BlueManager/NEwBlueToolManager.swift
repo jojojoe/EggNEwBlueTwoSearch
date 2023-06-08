@@ -303,6 +303,13 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
     
 }
 
+extension NEwBlueToolManager {
+    func showOpenSubscribeProVC(fuVC: UIViewController) {
+        let vc = NEwBlueSubscribeVC()
+        fuVC.navigationController?.pushViewController(vc, animated: true)
+    }
+}
+
 extension UIFont {
     static let SFProTextRegular = "SFProText-Regular"
     static let SFProTextMedium = "SFProText-Medium"
@@ -405,28 +412,29 @@ class NEwPeripheralItem: Equatable {
         return "\(Int(deviceDistancePercent() * 100))%"
     }
     
-    func deviceTagIconName(isSmall: Bool = false) -> String {
-        var iconStr = "device_bluetooth"
-        if deviceName.lowercased().contains("iphone") {
+    func deviceTagIconName(isBig: Bool = false) -> String {
+        var iconStr = "device_blue"
+        if deviceName.lowercased().contains("phone") {
             iconStr = "device_phone"
         } else if deviceName.lowercased().contains("book") {
-            iconStr = "device_mbp"
-        } else if deviceName.lowercased().contains("imac") {
-            iconStr = "device_mac"
-        } else if deviceName.lowercased().contains("airpod") {
-            iconStr = "device_airpod"
+            iconStr = "device_macbook"
+        } else if deviceName.lowercased().contains("mac") {
+            iconStr = "device_taishiji"
+        } else if deviceName.lowercased().contains("pod") {
+            iconStr = "device_erji"
         } else if deviceName.lowercased().contains("watch") {
             iconStr = "device_watch"
         } else if deviceName.lowercased().contains("pad") {
             iconStr = "device_pad"
         } else {
-            iconStr = "device_bluetooth"
+            iconStr = "device_blue"
         }
-        if isSmall {
-            return iconStr + "_s"
+        if isBig {
+            return iconStr + "_b"
         }
         return iconStr
     }
+    
     func fetchAboutDistanceString() -> String {
         let distance = calculateDistance(rssi: Int(rssi))
         var dis = CGFloat(Int(distance))
