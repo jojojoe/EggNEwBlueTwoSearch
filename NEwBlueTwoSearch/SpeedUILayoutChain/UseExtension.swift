@@ -5,6 +5,7 @@
 //  Created by Joe on 2023/6/4.
 //
 
+import UIKit
 import Foundation
 
 extension Double {
@@ -95,3 +96,27 @@ public class TaskDelay {
 }
 
 
+extension UIScreen {
+    static func isDevice8SE() -> Bool {
+        if Device.current.diagonal <= 4.7 {
+            return true
+        }
+        return false
+    }
+    
+    static func isDevice8SEPaid() -> Bool {
+        if Device.current.diagonal <= 4.7 || Device.current.diagonal >= 7.0 {
+            return true
+        }
+        return false
+    }
+    
+    static func isDevice8Plus() -> Bool {
+        if Device.current.diagonal == 5.5 {
+            return true
+        }
+        return false
+    }
+    
+    
+}

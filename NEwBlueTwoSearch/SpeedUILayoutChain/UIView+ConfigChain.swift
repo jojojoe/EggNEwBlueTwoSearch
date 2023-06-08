@@ -121,6 +121,11 @@ public extension UIImageView {
         return self
     }
     
+    @discardableResult
+    func isHighlighted(_ value: Bool = false) -> Self {
+        isHighlighted = value
+        return self
+    }
 }
 
 extension UILabel {
@@ -226,6 +231,11 @@ extension UIButton {
         return self
     }
     
+    @discardableResult
+    func isSelected(_ value: Bool = false) -> Self {
+        isSelected = value
+        return self
+    }
 }
 
 

@@ -121,15 +121,7 @@ class NEwBlueToolManager: NSObject {
     }
 }
 
-extension NEwBlueToolManager {
-    func isDevice8SE() -> Bool {
-        if Device.current.diagonal <= 4.7 || Device.current.diagonal >= 7.0 {
-            return true
-        } else {
-            return false
-        }
-    }
-}
+ 
 
 extension NEwBlueToolManager {
     func audioSlowVoiceStyle() -> String {

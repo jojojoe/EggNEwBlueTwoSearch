@@ -218,7 +218,7 @@ extension NEwBlueDeviceContentVC {
             $0.left.equalTo(foundBtn.snp.left)
             $0.width.equalTo(80)
             $0.height.equalTo(109)
-            if NEwBlueToolManager.default.isDevice8SE() {
+            if UIScreen.isDevice8SE() {
                 $0.bottom.equalTo(foundBtn.snp.top).offset(-10)
             } else {
                 $0.bottom.equalTo(foundBtn.snp.top).offset(-40)
@@ -257,7 +257,7 @@ extension NEwBlueDeviceContentVC {
         infoDescribeLabel
             .adhere(toSuperview: view) {
                 $0.centerX.equalToSuperview()
-                if NEwBlueToolManager.default.isDevice8SE() {
+                if UIScreen.isDevice8SE() {
                     $0.top.equalTo(persentLabel.snp.bottom).offset(10)
                 } else {
                     $0.top.equalTo(persentLabel.snp.bottom).offset(24)
