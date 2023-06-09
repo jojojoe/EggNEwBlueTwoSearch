@@ -45,6 +45,13 @@ extension Double {
     }
 }
 
+extension Double {
+    func rounded(digits: Int) -> Double {
+        let multiplier = pow(10.0, Double(digits))
+        return (self * multiplier).rounded() / multiplier
+    }
+}
+
 public class Once {
     var already: Bool = false
     

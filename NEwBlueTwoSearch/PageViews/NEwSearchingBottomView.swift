@@ -11,18 +11,46 @@ class NEwSearchingBottomView: UIView {
 
     var collection: UICollectionView!
     var closeClickBlock: (()->Void)?
+    var devicesContentClickBlock: (()->Void)?
     var itemclickBlock: ((NEwPeripheralItem)->Void)?
     var refreshWating: Bool = false
-//    var allDevicePreviewView: [BSiegBlueDeviceSearchingPreview] = []
-    // 在toolManager里添加每个Item的RingProgress 其他的在cell里刷新， searching bottom和 content list里的 RingProgress 公用一个
-    
+    let bottomV = UIView()
     var cellSize: CGSize = CGSize.zero
+    let titLabel1 = UILabel()
+    let titLabel2 = UILabel()
+    let deviceContentBtn = UIButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        cellSize = CGSize(width: CGFloat(Int(UIScreen.main.bounds.size.width / 3)), height: 140)
+        cellSize = CGSize(width: CGFloat(Int((UIScreen.main.bounds.size.width - 1) / 3)), height: 140)
         setupV()
         addNoti()
+    }
+    
+    func showContentStatus(isShow: Bool) {
+        var alphav: CGFloat = 0
+        if isShow {
+            alphav = 1
+            bottomV.snp.remakeConstraints {
+                $0.left.right.equalToSuperview()
+                $0.top.equalTo(self.snp.top).offset(65)
+                $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
+            }
+        } else {
+            bottomV.snp.remakeConstraints {
+                $0.left.right.equalToSuperview()
+                $0.top.equalTo(self.snp.bottom).offset(30)
+                $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
+                
+            }
+        }
+        UIView.animate(withDuration: 0.35, delay: 0) {
+            self.setNeedsLayout()
+            self.layoutIfNeeded()
+            self.titLabel1.alpha = alphav
+            self.titLabel2.alpha = alphav
+        }
+        
     }
     
     required init?(coder: NSCoder) {
@@ -41,37 +69,47 @@ class NEwSearchingBottomView: UIView {
     @objc func discoverDeviceUpdate(notification: Notification) {
         DispatchQueue.main.async {
             self.collection.reloadData()
+            self.deviceContentBtn
+                .title("\(NEwBlueToolManager.default.peripheralItemList.count) nearby devices found")
         }
     }
     
     func setupV() {
-        let titLabel1 = UILabel()
-        titLabel1.adhere(toSuperview: self) {
+        //
+        titLabel1.alpha = 0
+        titLabel2.alpha = 0
+        //
+        addSubview(bottomV)
+        bottomV.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalToSuperview()
-            $0.width.height.greaterThanOrEqualTo(10)
+            $0.width.equalTo(UIScreen.main.bounds.size.width)
+            $0.top.equalTo(self.snp.bottom).offset(30)
+            $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
         }
-        .text("Searching...")
-        .font(UIFont.SFProTextSemibold, 16)
-        .color(.white)
-        let titLabel2 = UILabel()
+        bottomV
+            .cornerRadius(30, masksToBounds: false)
+            .shadow(color: UIColor(hexString: "#385EE5"), radius: 20, opacity: 0.3, offset: CGSize(width: 0, height: 0), path: nil)
+            .backgroundColor(UIColor(hexString: "#F1F4FF")!)
+        
+        //
         titLabel2.adhere(toSuperview: self) {
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(titLabel1.snp.bottom).offset(12)
+            $0.bottom.equalTo(bottomV.snp.top).offset(-12)
             $0.width.height.greaterThanOrEqualTo(10)
         }
         .text("Please do not interrupt the operation")
         .font(UIFont.SFProTextRegular, 14)
         .color(.white)
         //
-        let bottomV = UIView()
-            .adhere(toSuperview: self) {
-                $0.left.right.equalToSuperview()
-                $0.top.equalTo(titLabel2.snp.bottom).offset(16)
-                $0.bottom.equalToSuperview().offset(40)
-            }
-            .cornerRadius(30, masksToBounds: false)
-            .shadow(color: UIColor(hexString: "#385EE5"), radius: 20, opacity: 0.3, offset: CGSize(width: 0, height: 0), path: nil)
+        titLabel1.adhere(toSuperview: self) {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(titLabel2.snp.top).offset(-12)
+            $0.width.height.greaterThanOrEqualTo(10)
+        }
+        .text("Searching...")
+        .font(UIFont.SFProTextSemibold, 16)
+        .color(.white)
+        
         //
         let closeBtn = UIButton()
             .adhere(toSuperview: bottomV) {
@@ -90,22 +128,49 @@ class NEwSearchingBottomView: UIView {
         collection.backgroundColor = .clear
         collection.delegate = self
         collection.dataSource = self
-        addSubview(collection)
+        bottomV.addSubview(collection)
         collection.snp.makeConstraints {
             $0.top.equalTo(closeBtn.snp.bottom).offset(5)
             $0.right.left.equalToSuperview()
-            $0.bottom.equalToSuperview().offset(-80)
+            $0.height.equalTo(UIScreen.main.bounds.size.height / 2 - 70 - 70)
         }
         collection.register(cellWithClass: NEwSearchingItemCell.self)
+        //
+        deviceContentBtn.adhere(toSuperview: bottomV) {
+            $0.centerX.equalToSuperview()
+            $0.left.right.equalToSuperview()
+            $0.height.equalTo(50)
+            $0.top.equalTo(collection.snp.bottom).offset(0)
+        }
+        .title("\(NEwBlueToolManager.default.peripheralItemList.count) nearby devices found")
+        .titleColor(UIColor(hexString: "#3971FF")!)
+        .font(UIFont.SFProTextSemibold, 14)
+        .target(target: self, action: #selector(deviceContentBtnClick), event: .touchUpInside)
+        let deviceContentArrowImgV = UIImageView()
+        deviceContentArrowImgV.image("CaretDoubleRight")
+            .adhere(toSuperview: deviceContentBtn) {
+                $0.centerY.equalToSuperview()
+                if let label = deviceContentBtn.titleLabel {
+                    $0.left.equalTo(label.snp.right).offset(10)
+                } else {
+                    $0.centerX.equalToSuperview()
+                }
+                $0.width.height.equalTo(12)
+            }
+        
     }
 
-    @objc func closeBtnClick() {
-        closeClickBlock?()
-    }
 }
 
 extension NEwSearchingBottomView {
     
+    @objc func closeBtnClick() {
+        closeClickBlock?()
+    }
+    
+    @objc func deviceContentBtnClick() {
+        devicesContentClickBlock?()
+    }
 
 }
 
@@ -130,20 +195,20 @@ extension NEwSearchingBottomView: UICollectionViewDataSource {
 
 extension NEwSearchingBottomView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cewidth: CGFloat = CGFloat(Int(UIScreen.main.bounds.size.width / 3))
-        return CGSize(width: cewidth, height: 140)
+        
+        return cellSize
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        return UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        return 15
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 15
+        return 0
     }
     
 }
@@ -181,11 +246,8 @@ class NEwSearchingItemCell: UICollectionViewCell {
         //
         contentView.addSubview(iconbgV)
         iconbgV.backgroundColor = UIColor(hexString: "#E8EDFF")
-        iconbgV.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.top.equalToSuperview()
-            $0.width.height.equalTo(60)
-        }
+        let cellW: CGFloat = CGFloat(Int((UIScreen.main.bounds.size.width - 1) / 3))
+        iconbgV.frame = CGRect(x: (cellW - 60)/2, y: 0, width: 60, height: 60)
         iconbgV.layer.cornerRadius = 30
         iconbgV.clipsToBounds = false
         //
@@ -198,8 +260,8 @@ class NEwSearchingItemCell: UICollectionViewCell {
         }
         
         //
-        deviceNameLabel.font = UIFont(name: "Poppins-Bold", size: 14)
-        deviceNameLabel.textColor = UIColor(hexString: "#242766")
+        deviceNameLabel.font = UIFont(name: UIFont.SFProTextSemibold, size: 14)
+        deviceNameLabel.textColor = UIColor(hexString: "#262B55")
         deviceNameLabel.lineBreakMode = .byTruncatingTail
         deviceNameLabel.numberOfLines = 2
         deviceNameLabel.textAlignment = .center
@@ -213,16 +275,20 @@ class NEwSearchingItemCell: UICollectionViewCell {
         
         //
         contentView.addSubview(distanceLabel)
-        distanceLabel.font = UIFont(name: "Poppins-Medium", size: 12)
-        distanceLabel.textColor = UIColor(hexString: "#242766")?.withAlphaComponent(0.5)
+        distanceLabel.font = UIFont(name: UIFont.SFProTextBold, size: 12)
+        distanceLabel.textColor = UIColor(hexString: "#3971FF")
+        distanceLabel.backgroundColor = .clear
         distanceLabel.adjustsFontSizeToFitWidth = true
         distanceLabel.textAlignment = .center
         distanceLabel.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(deviceNameLabel.snp.bottom)
+            $0.height.equalTo(22)
             $0.bottom.equalToSuperview()
-            $0.left.equalToSuperview().offset(10)
-        }    
+            $0.width.equalTo(54)
+        }
+        distanceLabel.layer.borderColor = UIColor(hexString: "#3971FF")!.cgColor
+        distanceLabel.layer.borderWidth = 1
+        distanceLabel.layer.cornerRadius = 11
     }
     
     func updateItemContentStatus(peripheralItem: NEwPeripheralItem) {
@@ -230,7 +296,7 @@ class NEwSearchingItemCell: UICollectionViewCell {
         let deviceNameStr = peripheralItem.deviceName
         
         let deviceIconStr = peripheralItem.deviceTagIconName(isBig: false)
-        let distancePercent = peripheralItem.deviceDistancePercent()
+//        let distancePercent = peripheralItem.deviceDistancePercent()
         let distanceAboutM = peripheralItem.fetchAboutDistanceString()
         //
         deviceIconImgV.image = UIImage(named: deviceIconStr)
@@ -238,10 +304,12 @@ class NEwSearchingItemCell: UICollectionViewCell {
         distanceLabel.text = distanceAboutM
         
         if self.iconbgV != peripheralItem.ringProgressView.superview {
-            peripheralItem.ringProgressView.superview?.frame = iconbgV.bounds
-            self.iconbgV.addSubview(peripheralItem.ringProgressView)
             
         }
+        
+        let ringBound = CGRect(x: 0, y: 0, width: 60, height: 60)
+        peripheralItem.ringProgressView.frame = ringBound
+        self.iconbgV.addSubview(peripheralItem.ringProgressView)
     }
     
 }

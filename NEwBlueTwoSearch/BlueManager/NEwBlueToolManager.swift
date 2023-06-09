@@ -13,6 +13,16 @@ import AudioToolbox
 
 
 class NEwBlueToolManager: NSObject {
+    //
+    
+    let shareUrl: String = "itms-apps://itunes.apple.com/cn/app/id\("6447954851")?mt=8"
+    let feedbackStr: String = "lwang0928@gmail.com"
+    let termsStr = "https://sites.google.com/view/findheadphone-termsofuse/home"
+    let privacyStr = "https://sites.google.com/view/findheadphone-privacypolicy/home"
+    
+    var isSplashBegin: Bool = false
+    
+    //
     static let `default` = NEwBlueToolManager()
     var centralManager: CBCentralManager!
     var peripheralItemList: [NEwPeripheralItem] = []
@@ -48,7 +58,6 @@ class NEwBlueToolManager: NSObject {
     func prepare() {
         centralManager = CBCentralManager(delegate: self, queue: queue)
     }
-    
     
     func startScan() {
         DispatchQueue.global().async {
@@ -243,7 +252,9 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
         
         if let deviceName = peripheral.name {
             if let peItem = peripheralItemList.first(where: { perItem in
-                perItem.identifier == peripheral.identifier.uuidString
+                let hasSameId = perItem.identifier == peripheral.identifier.uuidString
+                let hasSameName = perItem.deviceName == peripheral.identifier.uuidString
+                return hasSameId || hasSameName
             }) {
                 peItem.rssi = Double(truncating: RSSI)
                 debugPrint("peItem addr = \(peItem)")

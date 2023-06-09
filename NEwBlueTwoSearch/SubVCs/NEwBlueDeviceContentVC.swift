@@ -12,9 +12,9 @@ class NEwBlueDeviceContentVC: UIViewController {
     let titleDeviceNameLabel = UILabel()
     let backButton = UIButton()
     let favoriteHotBtn = UIButton()
-    let voiceBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_voice_n", selectImgStr: "content_voice_s")
-    let vibBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_vib_n", selectImgStr: "content_vib_s")
-    let postionBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_postion", selectImgStr: "content_postion")
+    let voiceBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_voice_n", selectImgStr: "content_voice_s", titStr: "Voice")
+    let vibBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_vib_n", selectImgStr: "content_vib_s", titStr: "Vibration")
+    let postionBtn = NeEwVoiceBtn(frame: .zero, norImgStr: "content_postion", selectImgStr: "content_postion", titStr: "Position")
     
     var peripheralItem: NEwPeripheralItem
     
@@ -111,6 +111,9 @@ class NEwBlueDeviceContentVC: UIViewController {
             ringProgressView.progress = progress
             persentLabel.text = percentStr
             
+            let distanceAboutM = peripheralItem.fetchAboutDistanceString()
+            let distanceAproxStr = "Approx. \(distanceAboutM) away from you"
+            infoDescribeLabel.text(distanceAproxStr)
             checkVoiceVibStatus()
             
         }
@@ -164,6 +167,7 @@ extension NEwBlueDeviceContentVC {
 extension NEwBlueDeviceContentVC {
     func setupV() {
         view.clipsToBounds = true
+        view.backgroundColor(UIColor(hexString: "#F1F4FF")!)
          
         backButton.adhere(toSuperview: view) {
             $0.left.equalToSuperview().offset(20)
@@ -266,9 +270,9 @@ extension NEwBlueDeviceContentVC {
                 $0.width.height.greaterThanOrEqualTo(30)
             }
             .textAlignment(.center)
-            .color(UIColor(hexString: "#262B55")!)
-            .font(UIFont.SFProTextHeavy, 24)
-        
+            .color(UIColor(hexString: "#262B55")!.withAlphaComponent(0.5))
+            .font(UIFont.SFProTextMedium, 16)
+            .text("")
         //
         centerV.adhere(toSuperview: view) {
             $0.left.right.equalToSuperview()
@@ -373,13 +377,12 @@ extension NEwBlueDeviceContentVC {
     }
     
     @objc func voiceBtnClick() {
-
-            voiceBtn.isSelected = !voiceBtn.isSelected
-            if voiceBtn.isSelected == true {
-                NEwBlueToolManager.default.playAudio()
-            } else {
-                NEwBlueToolManager.default.stopAudio()
-            }
+        voiceBtn.isSelected = !voiceBtn.isSelected
+        if voiceBtn.isSelected == true {
+            NEwBlueToolManager.default.playAudio()
+        } else {
+            NEwBlueToolManager.default.stopAudio()
+        }
     }
     
 }
@@ -389,16 +392,17 @@ class NeEwVoiceBtn: UIButton {
     let nameL = UILabel()
     var norImgStr: String
     var selectImgStr: String
+    var titStr: String
     override var isSelected: Bool {
         didSet {
             iconImgV.isHighlighted = isSelected
         }
     }
     
-    init(frame: CGRect, norImgStr: String, selectImgStr: String) {
+    init(frame: CGRect, norImgStr: String, selectImgStr: String, titStr: String) {
         self.norImgStr = norImgStr
         self.selectImgStr = selectImgStr
-        
+        self.titStr = titStr
         super.init(frame: frame)
         setupV()
     }
@@ -433,7 +437,7 @@ class NeEwVoiceBtn: UIButton {
             .numberOfLines(1)
             .color(UIColor(hexString: "#262B55")!)
             .font(UIFont.SFProTextMedium, 14)
-  
+            .text(titStr)
         
         
     }

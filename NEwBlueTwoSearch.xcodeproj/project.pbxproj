@@ -37,6 +37,8 @@
 		D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */; };
 		D8E76A232A2F70C3008BD289 /* NEwSwipeCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */; };
 		D8E76A252A321B1E008BD289 /* NEwBlueSubscribeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */; };
+		EB9B88742A333471007208D4 /* NEwBlueProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88732A333471007208D4 /* NEwBlueProManager.swift */; };
+		EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */; };
 		EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */; };
 		EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */; };
 		EB9E45412A2F251F0068AACB /* NEwBlueDevicePostionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */; };
@@ -79,6 +81,8 @@
 		D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSwipeCollectionCell.swift; sourceTree = "<group>"; };
 		D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueSubscribeVC.swift; sourceTree = "<group>"; };
 		D9A85237F94174B73FA55D54 /* Pods-NEwBlueTwoSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NEwBlueTwoSearch.release.xcconfig"; path = "Target Support Files/Pods-NEwBlueTwoSearch/Pods-NEwBlueTwoSearch.release.xcconfig"; sourceTree = "<group>"; };
+		EB9B88732A333471007208D4 /* NEwBlueProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueProManager.swift; sourceTree = "<group>"; };
+		EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueSplGuideVC.swift; sourceTree = "<group>"; };
 		EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDeviceContentVC.swift; sourceTree = "<group>"; };
 		EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDeviceListVC.swift; sourceTree = "<group>"; };
 		EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDevicePostionVC.swift; sourceTree = "<group>"; };
@@ -202,6 +206,7 @@
 			isa = PBXGroup;
 			children = (
 				D8E76A112A2C8F59008BD289 /* NEwBlueToolManager.swift */,
+				EB9B88732A333471007208D4 /* NEwBlueProManager.swift */,
 			);
 			path = BlueManager;
 			sourceTree = "<group>";
@@ -249,6 +254,7 @@
 				EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */,
 				EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */,
 				D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */,
+				EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */,
 			);
 			path = SubVCs;
 			sourceTree = "<group>";
@@ -383,6 +389,7 @@
 				D8E76A002A2C6F23008BD289 /* SwiftyTimer.swift in Sources */,
 				D8E76A042A2C872C008BD289 /* UIView+ConfigChain.swift in Sources */,
 				D8E769FD2A2C6E94008BD289 /* Device.generated.swift in Sources */,
+				EB9B88742A333471007208D4 /* NEwBlueProManager.swift in Sources */,
 				D8E76A252A321B1E008BD289 /* NEwBlueSubscribeVC.swift in Sources */,
 				D8E769F42A2C6D2F008BD289 /* KRHudExtensions.swift in Sources */,
 				D8E769DC2A2C6ADA008BD289 /* ViewController.swift in Sources */,
@@ -397,6 +404,7 @@
 				D8E76A122A2C8F59008BD289 /* NEwBlueToolManager.swift in Sources */,
 				D8E769DA2A2C6ADA008BD289 /* SceneDelegate.swift in Sources */,
 				D8E769F52A2C6D2F008BD289 /* KRProgressHUDIconType.swift in Sources */,
+				EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */,
 				D8E769F92A2C6DED008BD289 /* KRActivityIndicatorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -545,6 +553,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 97Y24FFSPP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
@@ -566,7 +575,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bluetwio.NEwBlueTwoSearch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xx.888888;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -585,6 +594,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 97Y24FFSPP;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
@@ -606,7 +616,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bluetwio.NEwBlueTwoSearch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xx.888888;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

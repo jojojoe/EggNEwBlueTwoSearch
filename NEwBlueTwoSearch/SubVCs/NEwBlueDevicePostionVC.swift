@@ -388,7 +388,7 @@ class NEwBlueDevicePostionVC: UIViewController {
         founditBtn.clipsToBounds = true
         founditBtn.setTitle("I Found It!", for: .normal)
         founditBtn.setTitleColor(.white, for: .normal)
-        founditBtn.titleLabel?.font = UIFont(name: "Poppins-Bold", size: 16)
+        founditBtn.titleLabel?.font = UIFont(name: UIFont.SFProTextBold , size: 16)
         founditBtn.addTarget(self, action: #selector(founditBtnClick(sender: )), for: .touchUpInside)
         
         //

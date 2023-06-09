@@ -10,8 +10,11 @@ import UIKit
 class NEwBlueDeviceListVC: UIViewController {
     
     var collection: UICollectionView!
-    
     let cellSize: CGSize = CGSize(width: UIScreen.main.bounds.width - 24 * 2, height: 78)
+    var restartClickBlock: (()->Void)?
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +25,7 @@ class NEwBlueDeviceListVC: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     func addNoti() {
         NotificationCenter.default.addObserver(self, selector:#selector(discoverDeviceUpdate(notification:)) , name: NEwBlueToolManager.default.discoverDeviceNotiName, object: nil)
@@ -44,7 +48,34 @@ class NEwBlueDeviceListVC: UIViewController {
         }
     }
     func setupContentV() {
-        view.backgroundColor = .clear
+        view.clipsToBounds = true
+        view.backgroundColor(UIColor(hexString: "#F1F4FF")!)
+        //
+        let backButton = UIButton()
+        
+        backButton.adhere(toSuperview: view) {
+            $0.left.equalToSuperview().offset(20)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
+            $0.width.height.equalTo(44)
+        }
+        .image(UIImage(named: "back_ic"))
+        .target(target: self, action: #selector(backBClick), event: .touchUpInside)
+        //
+        let titleDeviceNameLabel = UILabel()
+        titleDeviceNameLabel.adhere(toSuperview: view) {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalTo(backButton.snp.centerY)
+            $0.left.equalTo(backButton.snp.right).offset(10)
+            $0.height.equalTo(44)
+        }
+        .lineBreakMode(.byTruncatingTail)
+        .text("Connect Device")
+        .color(UIColor(hexString: "#242766")!)
+        .font(UIFont.SFProTextBold, 22)
+        .textAlignment(.center)
+        
+        
+        //
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         collection = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
@@ -55,10 +86,44 @@ class NEwBlueDeviceListVC: UIViewController {
         collection.dataSource = self
         view.addSubview(collection)
         collection.snp.makeConstraints {
-            $0.top.bottom.right.left.equalToSuperview()
+            $0.right.left.equalToSuperview()
+            $0.top.equalTo(backButton.snp.bottom).offset(8)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-70)
         }
         collection.register(cellWithClass: NEwDeviceListCell.self)
         collection.register(supplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withClass: NEwBlueDeviceHeader.self)
+        
+        //
+        let restartBtn = UIButton()
+        restartBtn.adhere(toSuperview: view) {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(collection.snp.bottom).offset(5)
+            $0.width.equalTo(326)
+            $0.height.equalTo(60)
+        }
+        .backgroundImage(UIImage(named: "restartbutton"))
+        .title("Restart")
+        .tintColor(.white)
+        .font(UIFont.SFProTextBold, 16)
+        .shadow(color: UIColor(hexString: "#242766")!, radius: 10, opacity: 0.05, offset: CGSize(width: 0, height: 5), path: nil)
+        .target(target: self, action: #selector(restartBtnClick), event: .touchUpInside)
+    }
+    
+    @objc func backBClick() {
+        if self.navigationController != nil {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    @objc func restartBtnClick() {
+        restartClickBlock?()
+        if self.navigationController != nil {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
+        }
     }
 }
 
@@ -448,8 +513,8 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         }
         //
         contentBgV.addSubview(deviceNameLabel)
-        deviceNameLabel.font = UIFont(name: "Poppins-Bold", size: 14)
-        deviceNameLabel.textColor = UIColor(hexString: "#242766")
+        deviceNameLabel.font = UIFont(name: UIFont.SFProTextBold, size: 16)
+        deviceNameLabel.textColor = UIColor(hexString: "#262B55")
         deviceNameLabel.lineBreakMode = .byTruncatingTail
         deviceNameLabel.textAlignment = .left
         deviceNameLabel.snp.makeConstraints {
@@ -461,8 +526,8 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         
         //
         contentBgV.addSubview(destanceLabel)
-        destanceLabel.font = UIFont(name: "Poppins-Medium", size: 12)
-        destanceLabel.textColor = UIColor(hexString: "#242766")?.withAlphaComponent(0.5)
+        destanceLabel.font = UIFont(name: UIFont.SFProTextMedium, size: 12)
+        destanceLabel.textColor = UIColor(hexString: "#262B55")?.withAlphaComponent(0.3)
 //        describeLabel.lineBreakMode = .byTruncatingTail
         destanceLabel.adjustsFontSizeToFitWidth = true
         destanceLabel.textAlignment = .left
@@ -476,7 +541,7 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         //
         let arrowImgV = UIImageView()
         arrowImgV.contentMode = .scaleAspectFit
-        arrowImgV.image = UIImage(named: "CaretRight")
+        arrowImgV.image = UIImage(named: "devieinfoarrworight")
         arrowImgV.clipsToBounds = true
         addSubview(arrowImgV)
         arrowImgV.snp.makeConstraints {
@@ -517,10 +582,13 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         destanceLabel.text = distanceAproxStr
         
         if self.iconbgV != peripheralItem.ringProgressView.superview {
-            peripheralItem.ringProgressView.superview?.frame = iconbgV.bounds
-            self.iconbgV.addSubview(peripheralItem.ringProgressView)
             
         }
+        
+        let ringBound = CGRect(x: 0, y: 0, width: 48, height: 48)
+        peripheralItem.ringProgressView.frame = ringBound
+        self.iconbgV.addSubview(peripheralItem.ringProgressView)
+        
     }
     
 }

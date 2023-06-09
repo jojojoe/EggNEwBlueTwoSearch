@@ -13,7 +13,7 @@ class ViewController: UIViewController {
     let bluetoothBtn =  NEwHomeToolBtn(frame: .zero, iconName: "Bluetooth", titStr: "Bluetooth")
     let manualBtn =  NEwHomeToolBtn(frame: .zero, iconName: "faq", titStr: "Manual")
     let settingBtn =  NEwHomeToolBtn(frame: .zero, iconName: "setting", titStr: "Settings")
-    
+    var searchingBottomPage: NEwSearchingBottomView?
     let homePage = NEwHomePageView()
     let settingPage = NEwSettingPageView()
     let manualPage = NEwManualPageView()
@@ -23,12 +23,14 @@ class ViewController: UIViewController {
         //
         setView1()
         bluetoothBtnClick()
+        //
+
     }
 
     func setView1() {
         view.clipsToBounds()
             .backgroundColor(.white)
-        let bgImgV = UIImageView()
+        let _ = UIImageView()
             .image("homeoage")
             .contentMode(.scaleAspectFill)
             .adhere(toSuperview: view) {
@@ -44,13 +46,6 @@ class ViewController: UIViewController {
             .adhere(toSuperview: contentV) {
                 $0.left.right.top.bottom.equalToSuperview()
             }
-        homePage.proClickBlock = {
-            [weak self] in
-            guard let `self` = self else {return}
-            DispatchQueue.main.async {
-                self.probtnClickAction()
-            }
-        }
         homePage.startScanBlock = {
             [weak self] in
             guard let `self` = self else {return}
@@ -67,7 +62,6 @@ class ViewController: UIViewController {
         manualPage.adhere(toSuperview: contentV) {
             $0.left.right.top.bottom.equalToSuperview()
         }
-        
         
         //
         let bottomToolBgV = UIView()
@@ -100,13 +94,111 @@ class ViewController: UIViewController {
     
 }
 
-
 extension ViewController {
-    func probtnClickAction() {
+    func showSearchingBlueStatus() {
+        
+        //
+        let searchingBottomPage = NEwSearchingBottomView()
+        self.searchingBottomPage = searchingBottomPage
+        searchingBottomPage.adhere(toSuperview: view) {
+            $0.left.right.bottom.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.centerY).offset(-50)
+        }
+        searchingBottomPage.closeClickBlock = {
+            [weak self] in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                self.hiddenSearchingBlueStatus()
+            }
+        }
+        searchingBottomPage.itemclickBlock = {
+            [weak self] perItem in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                self.showBlueDeviceContent(item: perItem)
+            }
+        }
+        searchingBottomPage.devicesContentClickBlock = {
+            [weak self] in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                self.showBlueContenentListVC()
+            }
+        }
+        
+        //
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.15) {
+            self.homePage.showSearchingStatus(isShow: true)
+            searchingBottomPage.showContentStatus(isShow: true)
+        }
+    }
+    
+    func hiddenSearchingBlueStatus() {
+        self.homePage.showSearchingStatus(isShow: false)
+        self.searchingBottomPage?.showContentStatus(isShow: false)
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.4) {
+            [weak self] in
+            guard let `self` = self else {return}
+            if let _ = self.searchingBottomPage?.superview {
+                self.searchingBottomPage?.removeFromSuperview()
+            }
+        }
         
     }
-    func scanBtnClickAction() {
+    
+    func showBlueDeniedV() {
+        let alertVC = UIAlertController(title: "Oops", message: "You have declined access to Bluetooth, please active it in Settings > Bluetooth.", preferredStyle: .alert)
+        let confirm = UIAlertAction(title: "Ok", style: .default, handler: { (goSettingAction) in
+            DispatchQueue.main.async {
+                let url = URL(string: UIApplication.openSettingsURLString)!
+                UIApplication.shared.open(url, options: [:])
+            }
+        })
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+        alertVC.addAction(cancel)
+        alertVC.addAction(confirm)
+        self.present(alertVC, animated: true)
+    }
+    
+    func showBlueDeviceContent(item: NEwPeripheralItem) {
+        let vc = NEwBlueDeviceContentVC(peripheral: item)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func showBlueContenentListVC() {
+        NEwBlueToolManager.default.stopScan()
         
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0) {
+            let vc = NEwBlueDeviceListVC()
+            self.navigationController?.pushViewController(vc, animated: true)
+            vc.restartClickBlock = {
+                [weak self] in
+                guard let `self` = self else {return}
+                DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.4) {
+                        NEwBlueToolManager.default.startScan()
+                        self.showSearchingBlueStatus()
+                    }
+                }
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.35) {
+            self.hiddenSearchingBlueStatus()
+        }
+    }
+}
+
+extension ViewController {
+    
+    func scanBtnClickAction() {
+        if NEwBlueToolManager.default.centralManagerStatus == true {
+            NEwBlueToolManager.default.peripheralItemList = []
+            NEwBlueToolManager.default.startScan()
+            showSearchingBlueStatus()
+        } else {
+            showBlueDeniedV()
+        }
     }
     
     @objc func bluetoothBtnClick() {
