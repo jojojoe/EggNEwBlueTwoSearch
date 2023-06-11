@@ -19,6 +19,8 @@ class NEwSearchingBottomView: UIView {
     let titLabel1 = UILabel()
     let titLabel2 = UILabel()
     let deviceContentBtn = UIButton()
+    let noDeviceBgV = UIView()
+    var ringProgressViewList: [String:RingProgressView] = [:]
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -68,6 +70,11 @@ class NEwSearchingBottomView: UIView {
     
     @objc func discoverDeviceUpdate(notification: Notification) {
         DispatchQueue.main.async {
+            if NEwBlueToolManager.default.peripheralItemList.count == 0 {
+                self.noDeviceBgV.isHidden = false
+            } else {
+                self.noDeviceBgV.isHidden = true
+            }
             self.collection.reloadData()
             self.deviceContentBtn
                 .title("\(NEwBlueToolManager.default.peripheralItemList.count) nearby devices found")
@@ -120,6 +127,7 @@ class NEwSearchingBottomView: UIView {
             .target(target: self, action: #selector(closeBtnClick), event: .touchUpInside)
         //
         
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         collection = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)
@@ -158,6 +166,37 @@ class NEwSearchingBottomView: UIView {
                 $0.width.height.equalTo(12)
             }
         
+        //
+        noDeviceBgV
+            .backgroundColor(UIColor(hexString: "#F1F4FF")!)
+            .adhere(toSuperview: bottomV) {
+                $0.left.right.bottom.equalToSuperview()
+                $0.top.equalTo(collection.snp.top)
+            }
+        let noDeviImgV = UIImageView()
+            .image("search_no")
+            .adhere(toSuperview: noDeviceBgV) {
+                $0.centerX.equalToSuperview()
+                $0.centerY.equalToSuperview().offset(-50)
+                $0.width.height.equalTo(120)
+            }
+        let noDeviLabe = UILabel()
+            .adhere(toSuperview: noDeviceBgV) {
+                $0.centerX.equalToSuperview()
+                $0.top.equalTo(noDeviImgV.snp.bottom).offset(20)
+                $0.width.height.greaterThanOrEqualTo(12)
+            }
+            .color(UIColor(hexString: "#262B55")!.withAlphaComponent(0.5))
+            .font(UIFont.SFProTextSemibold, 14)
+            .text("No devices found")
+            .textAlignment(.center)
+        
+        self.noDeviceBgV.isHidden = true
+//        if NEwBlueToolManager.default.peripheralItemList.count == 0 {
+//            self.noDeviceBgV.isHidden = false
+//        } else {
+//            self.noDeviceBgV.isHidden = true
+//        }
     }
 
 }
@@ -172,6 +211,20 @@ extension NEwSearchingBottomView {
         devicesContentClickBlock?()
     }
 
+    
+    func setupRingProgressV() -> RingProgressView {
+        let ringProgressView = RingProgressView()
+        ringProgressView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.backgroundRingColor = .clear
+        ringProgressView.ringWidth = 3
+        ringProgressView.shadowOpacity = 0
+        ringProgressView.hidesRingForZeroProgress = true
+        ringProgressView.progress = 0
+        return ringProgressView
+    }
+    
 }
 
 extension NEwSearchingBottomView: UICollectionViewDataSource {
@@ -179,6 +232,14 @@ extension NEwSearchingBottomView: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withClass: NEwSearchingItemCell.self, for: indexPath)
         let preitem = NEwBlueToolManager.default.peripheralItemList[indexPath.item]
         cell.updateItemContentStatus(peripheralItem: preitem)
+        var rinigV = ringProgressViewList[preitem.identifier]
+        if rinigV == nil {
+            rinigV = setupRingProgressV()
+            ringProgressViewList[preitem.identifier] = rinigV
+        }
+        cell.iconbgV.removeSubviews()
+        cell.iconbgV.addSubview(rinigV!)
+        rinigV!.progress = preitem.deviceDistancePercent()
         
         return cell
     }
@@ -233,6 +294,7 @@ class NEwSearchingItemCell: UICollectionViewCell {
     let distanceLabel = UILabel()
     let iconbgV = UIView()
     
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -253,7 +315,7 @@ class NEwSearchingItemCell: UICollectionViewCell {
         //
         deviceIconImgV.contentMode = .scaleAspectFit
         deviceIconImgV.clipsToBounds = true
-        iconbgV.addSubview(deviceIconImgV)
+        contentView.addSubview(deviceIconImgV)
         deviceIconImgV.snp.makeConstraints {
             $0.center.equalTo(iconbgV)
             $0.top.left.equalToSuperview().offset(12)
@@ -289,7 +351,11 @@ class NEwSearchingItemCell: UICollectionViewCell {
         distanceLabel.layer.borderColor = UIColor(hexString: "#3971FF")!.cgColor
         distanceLabel.layer.borderWidth = 1
         distanceLabel.layer.cornerRadius = 11
+        
+        //
+        
     }
+    
     
     func updateItemContentStatus(peripheralItem: NEwPeripheralItem) {
         self.peripheralItem = peripheralItem
@@ -302,14 +368,17 @@ class NEwSearchingItemCell: UICollectionViewCell {
         deviceIconImgV.image = UIImage(named: deviceIconStr)
         deviceNameLabel.text = deviceNameStr
         distanceLabel.text = distanceAboutM
+//        ringProgressView.progress = peripheralItem.deviceDistancePercent()
         
-        if self.iconbgV != peripheralItem.ringProgressView.superview {
-            
-        }
+//        if self.iconbgV != peripheralItem.ringProgressView.superview {
+//            self.iconbgV.removeSubviews()
+//            let ringBound = CGRect(x: 0, y: 0, width: 60, height: 60)
+//            peripheralItem.ringProgressView.frame = ringBound
+//            self.iconbgV.addSubview(peripheralItem.ringProgressView)
+//
+//        }
         
-        let ringBound = CGRect(x: 0, y: 0, width: 60, height: 60)
-        peripheralItem.ringProgressView.frame = ringBound
-        self.iconbgV.addSubview(peripheralItem.ringProgressView)
+
     }
     
 }

@@ -44,7 +44,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        addNoti()
         setupV()
         
         updateFavoriteStatus()
@@ -57,7 +57,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     
     func addNoti() {
         NotificationCenter.default.addObserver(self, selector:#selector(discoverDeviceUpdate(notification:)) , name: NEwBlueToolManager.default.trackingDeviceNotiName, object: nil)
-        
+        NotificationCenter.default.addObserver(self, selector:#selector(deviceFavoriteChange(notification:)) , name: NEwBlueToolManager.default.deviceFavoriteChangeNotiName, object: nil)
     }
     
     func removeNoti() {
@@ -72,14 +72,25 @@ class NEwBlueDeviceContentVC: UIViewController {
         }
     }
     
+    @objc func deviceFavoriteChange(notification: Notification) {
+        DispatchQueue.main.async {
+            if NEwBlueToolManager.default.favoriteDevicesIdList.contains(self.peripheralItem.identifier) {
+                self.favoriteHotBtn.isSelected = true
+            } else {
+                self.favoriteHotBtn.isSelected = false
+            }
+        }
+    }
+    
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        addNoti()
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        removeNoti()
+        
     }
     
     deinit {
@@ -149,7 +160,6 @@ class NEwBlueDeviceContentVC: UIViewController {
 
 extension NEwBlueDeviceContentVC {
     
-    
 }
 
 extension NEwBlueDeviceContentVC {
@@ -170,7 +180,7 @@ extension NEwBlueDeviceContentVC {
         view.backgroundColor(UIColor(hexString: "#F1F4FF")!)
          
         backButton.adhere(toSuperview: view) {
-            $0.left.equalToSuperview().offset(20)
+            $0.left.equalToSuperview().offset(10)
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.width.height.equalTo(44)
         }
@@ -185,8 +195,8 @@ extension NEwBlueDeviceContentVC {
         }
         .lineBreakMode(.byTruncatingTail)
         .text(peripheralItem.deviceName)
-        .color(UIColor(hexString: "#242766")!)
-        .font(UIFont.SFProTextBold, 22)
+        .color(UIColor(hexString: "#262B55")!)
+        .font(UIFont.SFProTextBold, 20)
         .textAlignment(.center)
         
         favoriteHotBtn.adhere(toSuperview: view) {
@@ -202,11 +212,16 @@ extension NEwBlueDeviceContentVC {
         let foundBtn = UIButton()
         foundBtn.adhere(toSuperview: view) {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().offset(-25)
+            if UIScreen.isDevice8SE() {
+                $0.bottom.equalToSuperview().offset(-15)
+            } else {
+                $0.bottom.equalToSuperview().offset(-25)
+            }
+            
             $0.width.equalTo(326)
             $0.height.equalTo(60)
         }
-        .backgroundImage(UIImage(named: ""))
+        .backgroundImage(UIImage(named: "restartbutton"))
         .title("I Found It")
         .titleColor(UIColor.white)
         .font(UIFont.SFProTextBold, 16)

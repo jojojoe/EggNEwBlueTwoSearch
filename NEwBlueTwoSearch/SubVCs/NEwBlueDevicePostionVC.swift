@@ -10,246 +10,23 @@ import MapKit
 import CoreLocation
 
 
-/// 刻度视图
-class BSiegMapDegreeScaleV: UIView {
-    
-    /// 背景视图
-    private lazy var backgroundView: UIView = {
-        let v = UIView(frame: bounds)
-        return v
-    }()
-    
-    /// 水平视图
-    private lazy var levelView: UIView = {
-        let levelView = UIView(frame: CGRect(x: 0, y: 0, width: self.frame.size.width / 2 - 50, height: 1))
-        levelView.center = CGPoint(x: self.frame.size.width / 2, y: self.frame.size.height / 2)
-//        levelView.backgroundColor = .white
-        levelView.backgroundColor = .clear
-        return levelView
-    }()
-    
-    /// 垂直视图
-    private lazy var verticalView: UIView = {
-        let verticalView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: self.frame.size.height / 2 - 50))
-        verticalView.center = CGPoint(x: self.frame.size.width / 2, y: self.frame.size.height / 2)
-//        verticalView.backgroundColor = .white
-        verticalView.backgroundColor = .clear
-        return verticalView
-    }()
-    
-    /// 指针视图
-    private lazy var lineView: UIView = {
-        let lineView = UIView(frame: CGRect(x: self.frame.size.width / 2 - 1.5, y: 20, width: 3, height: 60))
-//        lineView.backgroundColor = .white
-        lineView.backgroundColor = .clear
-        return lineView
-    }()
-    
-    /// 指南针三角视图
-    private lazy var compassTriangleView: UIView = {
-        let screenW: CGFloat = 200
-        let triangle = UIView(frame: CGRect(x: 0, y: 0, width: screenW, height: screenW))
-        triangle.backgroundColor = .clear
-        return triangle
-    }()
-    
-    /// 红色三角视图
-    private lazy var redTriangleView = UIView()
-    
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        clipsToBounds = true
-        layer.cornerRadius = frame.size.width / 2
-        addSubview(backgroundView)
-        addSubview(levelView)
-        addSubview(verticalView)
-        insertSubview(lineView, at: 0)
-        configScaleDial()
-        addSubview(compassTriangleView)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-enum MoveDirection {
-    case east
-    case eastN
-    case eastS
-    case west
-    case westN
-    case westS
-    case nort
-    case sorth
-}
-
-
-//MARK: - Update multiple times
-extension BSiegMapDegreeScaleV {
-    
-    /// 计算中心坐标
-    ///
-    /// - Parameters:
-    ///   - center: 中心点
-    ///   - angle: 角度
-    ///   - scale: 刻度
-    /// - Returns: CGPoint
-    private func calculateTextPositon(withArcCenter center: CGPoint, andAngle angle: CGFloat, andScale scale: CGFloat) -> CGPoint {
-        let x = (self.frame.size.width / 2 - 50) * scale * CGFloat(cosf(Float(angle)))
-        let y = (self.frame.size.width / 2 - 50) * scale * CGFloat(sinf(Float(angle)))
-        return CGPoint(x: center.x + x, y: center.y + y)
-    }
-    
-    /// 旋转重置刻度标志的方向
-    ///
-    /// - Parameter heading: 航向
-    public func resetDirection(_ heading: CGFloat) {
-        backgroundView.transform = CGAffineTransform(rotationAngle: heading)
-        for label in backgroundView.subviews {
-            backgroundView.subviews[1].transform = .identity    // 红色三角视图，不旋转。
-            label.transform = CGAffineTransform(rotationAngle: -heading)
-        }
-    }
-    
-}
-
-//MARK: - Configure
-extension BSiegMapDegreeScaleV {
-    
-    /// 配置刻度表
-    private func configScaleDial() {
-        
-        /// 360度
-        let degree_360: CGFloat = CGFloat.pi
-        
-        /// 180度
-        let degree_180: CGFloat = degree_360 / 2
-        
-        /// 角度
-        let angle: CGFloat = degree_360 / 90
-        
-        /// 方向数组
-        let directionArray = ["北", "东", "南", "西"]
-        
-        /// 点
-        let po = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-        
-        //画圆环，每隔2°画一个弧线，总共180条
-        for i in 0 ..< 180 {
-            
-            /// 开始角度
-            let startAngle: CGFloat = -(degree_180 + degree_360 / 180 / 2) + angle * CGFloat(i)
-            
-            /// 结束角度
-            let endAngle: CGFloat = startAngle + angle / 2
-            
-            // 创建一个路径对象
-            let bezPath = UIBezierPath(arcCenter: po, radius: frame.size.width / 2 - 70, startAngle: startAngle, endAngle: endAngle, clockwise: true)
-            
-            /// 形变图层
-            let shapeLayer = CAShapeLayer()
-            
-            if i % 15 == 0 {
-                // 设置描边色
-//                shapeLayer.strokeColor = UIColor.white.cgColor
-                shapeLayer.strokeColor = UIColor.clear.cgColor
-                shapeLayer.lineWidth = 20
-            }else {
-//                shapeLayer.strokeColor = UIColor.gray.cgColor
-                shapeLayer.strokeColor = UIColor.clear.cgColor
-                shapeLayer.lineWidth = 20
-            }
-            shapeLayer.path = bezPath.cgPath
-            shapeLayer.fillColor = UIColor.clear.cgColor    // 设置填充路径色
-            backgroundView.layer.addSublayer(shapeLayer)
-            
-            // 刻度的标注
-            if i % 15 == 0 {
-                /// 刻度的标注 0 30 60...
-                var tickText = "\(i * 2)"
-                
-                let textAngle: CGFloat = startAngle + (endAngle - startAngle) / 2
-                
-                let point: CGPoint = calculateTextPositon(withArcCenter: po, andAngle: textAngle, andScale: 1.15)
-                
-                // UILabel
-                let label = UILabel(frame: CGRect(x: point.x, y: point.y, width: 30, height: 20))
-                label.center = point
-                label.text = tickText
-//                label.textColor = .white
-                label.textColor = .clear
-                label.font = UIFont.systemFont(ofSize: 15)
-                label.textAlignment = .center
-                backgroundView.addSubview(label)
-                
-                if i % 45 == 0 {    //北 东 南 西
-                    tickText = directionArray[i / 45]
-                    
-                    let point2: CGPoint = calculateTextPositon(withArcCenter: po, andAngle: textAngle, andScale: 0.65)
-                    // UILabel
-                    let label2 = UILabel(frame: CGRect(x: point2.x, y: point2.y, width: 30, height: 30))
-                    label2.center = point2
-                    label2.text = tickText
-//                    label2.textColor = .white
-                    label2.textColor = .clear
-                    label2.font = UIFont.systemFont(ofSize: 27)
-                    label2.textAlignment = .center
-                    
-                    if tickText == "北" {
-                        DrawRedTriangleView(point)
-                    }
-                    backgroundView.addSubview(label2)
-                }
-            }
-        }
-    }
-    
-    /// 绘制红色三角形视图
-    private func DrawRedTriangleView(_ point: CGPoint) {
-        let triwidth: CGFloat = 34
-        
-        
-        redTriangleView = UIView(frame: CGRect(x: point.x, y: point.y, width: triwidth, height: triwidth))
-        redTriangleView.center = CGPoint(x: point.x, y: point.y)
-        redTriangleView.backgroundColor = .clear
-        backgroundView.addSubview(redTriangleView)
-        
-        
-        // 画三角
-        
-        
-        let trianglePath = UIBezierPath()
-        var point = CGPoint(x: 0 + 4, y: triwidth)
-        trianglePath.move(to: point)
-        point = CGPoint(x: triwidth / 2, y: 0)
-        trianglePath.addLine(to: point)
-        point = CGPoint(x: triwidth - 4, y: triwidth)
-        trianglePath.addLine(to: point)
-        trianglePath.close()
-        let triangleLayer = CAShapeLayer()
-        triangleLayer.path = trianglePath.cgPath
-        triangleLayer.fillColor = UIColor(hexString: "#3971FF")!.cgColor
-        redTriangleView.layer.addSublayer(triangleLayer)
-    }
-    
-}
 
 class NEwBlueDevicePostionVC: UIViewController {
 
     let mapView: MKMapView = MKMapView()
-    let tiNameLabel = UILabel()
+    
     let infoDevNameLabel = UILabel()
     let infoPostionLabel = UILabel()
     var bluetoothDevice: NEwPeripheralItem
     let locationManager:CLLocationManager = CLLocationManager()
     var firstDisplay = true
-    var mapDegree: BSiegMapDegreeScaleV!
+    var mapDegree: NEwBlueDeviceDegreeScaleV!
     var currentDirection: MoveDirection = .nort
     var currentOffsetRotate: CGFloat = 0
     var currentCachaRssi: Double = 0
+    let titleDeviceNameLabel = UILabel()
+    let backButton = UIButton()
+    let favoriteHotBtn = UIButton()
     
     var refreshWating: Bool = false
     var currentHeadi: Float = 0
@@ -294,7 +71,9 @@ class NEwBlueDevicePostionVC: UIViewController {
         
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestAlwaysAuthorization()
+        
         setupV()
+        
         if CLLocationManager.locationServicesEnabled() && CLLocationManager.headingAvailable() {
 //            locationManager.startMonitoringSignificantLocationChanges()
             locationManager.startUpdatingLocation()
@@ -302,7 +81,7 @@ class NEwBlueDevicePostionVC: UIViewController {
         }
         //
         let degreeWidth: CGFloat = 240
-        mapDegree = BSiegMapDegreeScaleV(frame: CGRect(x: (UIScreen.main.bounds.size.width - degreeWidth)/2, y: (UIScreen.main.bounds.size.height - UIScreen.main.bounds.size.width) / 2, width: degreeWidth, height: degreeWidth))
+        mapDegree = NEwBlueDeviceDegreeScaleV(frame: CGRect(x: (UIScreen.main.bounds.size.width - degreeWidth)/2, y: (UIScreen.main.bounds.size.height - UIScreen.main.bounds.size.width) / 2, width: degreeWidth, height: degreeWidth))
         view.addSubview(mapDegree)
         mapDegree.isUserInteractionEnabled = false
         mapDegree.backgroundColor = .clear
@@ -327,103 +106,109 @@ class NEwBlueDevicePostionVC: UIViewController {
             $0.left.right.top.bottom.equalToSuperview()
         }
         //
-        let backB = UIButton()
-        view.addSubview(backB)
-        backB.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(20)
+        backButton.adhere(toSuperview: view) {
+            $0.left.equalToSuperview().offset(10)
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.width.height.equalTo(44)
         }
-        backB.setImage(UIImage(named: "nav_back"), for: .normal)
-        backB.addTarget(self, action: #selector(backBClick(sender: )), for: .touchUpInside)
-        
+        .image(UIImage(named: "back_ic"))
+        .target(target: self, action: #selector(backBClick), event: .touchUpInside)
         //
-        
-        view.addSubview(tiNameLabel)
-        tiNameLabel.snp.makeConstraints {
-            $0.left.equalTo(backB.snp.right).offset(20)
-            $0.centerY.equalTo(backB.snp.centerY).offset(0)
+        titleDeviceNameLabel.adhere(toSuperview: view) {
             $0.centerX.equalToSuperview()
-            $0.height.greaterThanOrEqualTo(17)
+            $0.centerY.equalTo(backButton.snp.centerY)
+            $0.left.equalTo(backButton.snp.right).offset(10)
+            $0.height.equalTo(44)
         }
-        tiNameLabel.lineBreakMode = .byTruncatingTail
-        tiNameLabel.text = bluetoothDevice.deviceName
-        tiNameLabel.textAlignment = .center
-        tiNameLabel.textColor = UIColor(hexString: "#242766")
-        tiNameLabel.font = UIFont(name: "Poppins-Bold", size: 24)
+        .lineBreakMode(.byTruncatingTail)
+        .text(bluetoothDevice.deviceName)
+        .color(UIColor(hexString: "#262B55")!)
+        .font(UIFont.SFProTextBold, 20)
+        .textAlignment(.center)
+        
+        favoriteHotBtn.adhere(toSuperview: view) {
+            $0.right.equalToSuperview().offset(-20)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
+            $0.width.height.equalTo(44)
+        }
+        .image(UIImage(named: "Heart_ic"), .normal)
+        .image(UIImage(named: "Heart_s"), .selected)
+        .target(target: self, action: #selector(favoriteBtnClick(sender: )), event: .touchUpInside)
         
         //
+        if NEwBlueToolManager.default.favoriteDevicesIdList.contains(self.bluetoothDevice.identifier) {
+            self.favoriteHotBtn.isSelected = true
+        } else {
+            self.favoriteHotBtn.isSelected = false
+        }
+        
         setupSearchAgainV()
     }
     
     func setupSearchAgainV() {
         //
-        let bottomBar = UIView()
+        let bottomBar = UIView(frame: CGRect(x: 0, y: UIScreen.main.bounds.size.height - 200, width: UIScreen.main.bounds.size.width, height: 200))
+            .backgroundColor(UIColor(hexString: "#F1F4FF")!)
+            .shadow(color: UIColor(hexString: "#385EE5")!, radius: 30, opacity: 0.3, offset: CGSize(width: 0, height: 0), path: nil)
+        bottomBar.roundCorners([.topLeft, .topRight], radius: 20)
         view.addSubview(bottomBar)
-        bottomBar.backgroundColor = .clear
-        bottomBar.snp.makeConstraints {
-            $0.left.right.bottom.equalToSuperview()
-            $0.height.equalTo(190)
-        }
-        bottomBar.layer.cornerRadius = 30
-        bottomBar.addShadow(ofColor: UIColor(hexString: "#2B2F3C")!, radius: 40, offset: CGSize(width: 0, height: -5), opacity: 0.1)
         //
-        let bottomBgImgv = UIImageView()
-        bottomBar.addSubview(bottomBgImgv)
-        bottomBgImgv.snp.makeConstraints {
-            $0.left.right.top.bottom.equalToSuperview()
+        let bottomBarCloseBtn = UIButton()
+            .adhere(toSuperview: bottomBar) {
+                $0.centerX.equalToSuperview()
+                $0.width.equalTo(50)
+                $0.height.equalTo(32)
+                $0.top.equalToSuperview().offset(4)
+            }
+            .image(UIImage(named: "mappointcloseline"))
+            .target(target: self, action: #selector(bottomBarCloseBtnClick), event: .touchUpInside)
+            .isEnabled(false)
+        //
+        infoDevNameLabel
+            .adhere(toSuperview: bottomBar) {
+                $0.left.equalToSuperview().offset(30)
+                $0.top.equalTo(bottomBarCloseBtn.snp.bottom).offset(0)
+                $0.width.height.greaterThanOrEqualTo(20)
+            }
+            .lineBreakMode(.byTruncatingTail)
+            .text(bluetoothDevice.deviceName)
+            .textAlignment(.left)
+            .color(UIColor(hexString: "#262B55")!)
+            .font(UIFont.SFProTextBold, 16)
+        
+        //
+        infoPostionLabel.adhere(toSuperview: bottomBar) {
+            $0.left.equalToSuperview().offset(30)
+            $0.right.equalToSuperview().offset(-30)
+            $0.top.equalTo(infoDevNameLabel.snp.bottom).offset(0)
+            $0.height.equalTo(50)
         }
-        bottomBgImgv.image = UIImage(named: "mapbottom")
+        .color(UIColor(hexString: "#262B55")!.withAlphaComponent(0.5))
+        .font(UIFont.SFProTextRegular, 12)
+        .numberOfLines(0)
+        .textAlignment(.left)
+        .adjustsFontSizeToFitWidth()
         //
         let founditBtn = UIButton()
-        bottomBar.addSubview(founditBtn)
-        founditBtn.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.left.equalToSuperview().offset(30)
-            $0.bottom.equalToSuperview().offset(-40)
-            $0.height.equalTo(60)
-        }
-        founditBtn.backgroundColor = UIColor(hexString: "#3971FF")
-        founditBtn.layer.cornerRadius = 30
-        founditBtn.clipsToBounds = true
-        founditBtn.setTitle("I Found It!", for: .normal)
-        founditBtn.setTitleColor(.white, for: .normal)
-        founditBtn.titleLabel?.font = UIFont(name: UIFont.SFProTextBold , size: 16)
-        founditBtn.addTarget(self, action: #selector(founditBtnClick(sender: )), for: .touchUpInside)
+            .adhere(toSuperview: bottomBar) {
+                $0.centerX.equalToSuperview()
+                $0.width.equalTo(326)
+                $0.top.equalTo(infoPostionLabel.snp.bottom).offset(5)
+                $0.height.equalTo(60)
+            }
+            .backgroundImage(UIImage(named: "restartbutton"))
+            .font(UIFont.SFProTextBold, 16)
+            .titleColor(.white)
+            .title("I Found It!")
+            .target(target: self, action: #selector(founditBtnClick), event: .touchUpInside)
         
-        //
         
-        bottomBar.addSubview(infoDevNameLabel)
-        infoDevNameLabel.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(30)
-            $0.top.equalToSuperview().offset(24)
-            $0.width.height.greaterThanOrEqualTo(17)
-        }
-        infoDevNameLabel.lineBreakMode = .byTruncatingTail
-        infoDevNameLabel.text = bluetoothDevice.deviceName
-        infoDevNameLabel.textAlignment = .center
-        infoDevNameLabel.textColor = UIColor(hexString: "#242766")
-        infoDevNameLabel.font = UIFont(name: "Poppins-Bold", size: 16)
-        
-         
-        
-        bottomBar.addSubview(infoPostionLabel)
-        infoPostionLabel.snp.makeConstraints {
-            $0.left.equalToSuperview().offset(30)
-            $0.top.equalTo(infoDevNameLabel.snp.bottom)
-            $0.bottom.equalTo(founditBtn.snp.top).offset(-2)
-            $0.centerX.equalToSuperview()
-        }
-        infoPostionLabel.numberOfLines = 0
-        infoPostionLabel.text = ""
-        infoPostionLabel.textAlignment = .left
-        infoPostionLabel.textColor = UIColor(hexString: "#242766")!.withAlphaComponent(0.5)
-        infoPostionLabel.font = UIFont(name: "Poppins", size: 12)
-        infoPostionLabel.adjustsFontSizeToFitWidth = true
     }
 
     
-    
+    @objc func bottomBarCloseBtnClick() {
+        
+    }
     
     @objc func backBClick(sender: UIButton) {
         if self.navigationController != nil {
@@ -433,13 +218,31 @@ class NEwBlueDevicePostionVC: UIViewController {
         }
     }
     
-    @objc func founditBtnClick(sender: UIButton) {
+    @objc func founditBtnClick() {
         if self.navigationController != nil {
             self.navigationController?.popViewController()
         } else {
             self.dismiss(animated: true, completion: nil)
         }
          
+    }
+    
+    @objc func favoriteBtnClick(sender: UIButton) {
+        sender.isSelected = !sender.isSelected
+        if sender.isSelected == true {
+            trackStatusChange(isTracking: true)
+        } else {
+            trackStatusChange(isTracking: false)
+        }
+        
+    }
+    
+    func trackStatusChange(isTracking: Bool) {
+        if isTracking {
+            NEwBlueToolManager.default.addUserFavorite(deviceId: bluetoothDevice.identifier)
+        } else {
+            NEwBlueToolManager.default.removeUserFavorite(deviceId: bluetoothDevice.identifier)
+        }
     }
     
 }
@@ -466,20 +269,6 @@ extension NEwBlueDevicePostionVC: MKMapViewDelegate {
         
         /// 角度
         let angle = Int(theHeading)
-        /*
-        switch angle {
-        case 0:
-//            debugPrint("北")
-        case 90:
-//            debugPrint("东")
-        case 180:
-//            debugPrint("南")
-        case 270:
-//            debugPrint("西")
-        default:
-            break
-        }
-        */
         
         if angle > 350 && angle < 10 {
             currentDirection = .nort
@@ -554,23 +343,12 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
                         currentCachaRssi = currentRssi
                         nextPostion()
                         mapDegree.resetDirection(CGFloat(currentHeadi) + currentOffsetRotate)
-
-//                        let headingstring = "headi=\(CGFloat(headi))\n\("偏转\(Int(magneticHeading))") - \(currentOffsetRotate)"
-//                        debugPrint(headingstring)
                     }
-
-
-//                    infoDevNameLabel.text = headingstring
-//                    infoDevNameLabel.font = UIFont.systemFont(ofSize: 10)
-//                    infoDevNameLabel.numberOfLines = 2
                 }
             }
-            
-//            locationManager.stopUpdatingLocation()
         }
     }
     
-    // 获得设备地理和地磁朝向数据，从而转动地理刻度表以及表上的文字标注
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         /*
             trueHeading     : 真北方向
@@ -593,10 +371,7 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
             // 设置角度label文字
             debugPrint("偏转角度\(Int(magneticHeading))")
             
-            
-            // 3.旋转变换
-            
-            // 4.当前手机（摄像头)朝向方向
+            // 4.
             update(newHeading)
             
             //
@@ -620,17 +395,8 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
                         let headingstring = "headi=\(CGFloat(headi))\n\("偏转\(Int(magneticHeading))") - \(currentOffsetRotate)"
                         debugPrint(headingstring)
                     }
-                    
-                    
-//                    infoDevNameLabel.text = headingstring
-//                    infoDevNameLabel.font = UIFont.systemFont(ofSize: 10)
-//                    infoDevNameLabel.numberOfLines = 2
                 }
             }
-            
-            
-            
-            
         }
     }
     
@@ -662,7 +428,7 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
         }
     }
     
-    // 判断设备是否需要校验，受到外来磁场干扰时
+    // 
     func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {
         return true
     }
@@ -691,3 +457,4 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
         return realHeading
     }
 }
+

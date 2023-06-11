@@ -118,10 +118,11 @@ class NEwSwipeCollectionCell: UICollectionViewCell,UIGestureRecognizerDelegate {
             if  self.revealView == nil {
                 self._createDefaultRevealView()
             }
-            if  self.snapShotView == nil {
+            if self.snapShotView == nil {
+                self.backgroundColor = .clear
                 self.snapShotView = self.snapshotView(afterScreenUpdates: false)
                 if  self.snapShotView?.backgroundColor == UIColor.clear || self.snapShotView?.backgroundColor == nil {
-                    self.snapShotView?.backgroundColor = UIColor.white
+                    self.snapShotView?.backgroundColor = UIColor(hexString: "#F1F4FF") ?? UIColor.white
                 }
                 self.snapShotView?.layer.cornerRadius = 20
                 self.snapShotView?.clipsToBounds = true
@@ -132,6 +133,9 @@ class NEwSwipeCollectionCell: UICollectionViewCell,UIGestureRecognizerDelegate {
             self._closeOtherOpeningCell()
             self.addSubview(self.revealView!)
             self.addSubview(snapShotView)
+            //
+            self.contentView.alpha = 0
+            
         case .changed:
             let translationPoint = panGestureRecognizer.translation(in: self)
             var centerPoint = CGPoint(x: 0, y: self.snapShotView!.center.y)
@@ -147,7 +151,10 @@ class NEwSwipeCollectionCell: UICollectionViewCell,UIGestureRecognizerDelegate {
             }
             if _lessThenRevealViewHalfWidth() || _shouldHideRevealView(forVelocity: velocity) {
                 hideRevealView(withAnimated: true)
+                self.contentView.alpha = 1
+                self.backgroundColor = .white
             }
+//
         default: break
         }
     }
@@ -189,6 +196,8 @@ class NEwSwipeCollectionCell: UICollectionViewCell,UIGestureRecognizerDelegate {
         if superCollectionView.openingCell != self {
             if  superCollectionView.openingCell != nil {
                 superCollectionView.openingCell!.hideRevealView(withAnimated: true)
+                superCollectionView.openingCell!.contentView.alpha = 1
+                superCollectionView.openingCell!.backgroundColor = .white
             }
             superCollectionView.openingCell = self
         }

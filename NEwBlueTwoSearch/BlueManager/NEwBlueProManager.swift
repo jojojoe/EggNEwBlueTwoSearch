@@ -12,15 +12,12 @@ import TPInAppReceipt
 import StoreKit
 
 
-
-
-
 class NEwBlueProManager {
     public static var `default` = NEwBlueProManager()
     
     
     public enum IAPType: String {
-        
+        case week = "com.find.cellphones.week"
         case month = "com.find.cellphones.month"
         case year = "com.find.cellphones.year"
     }
@@ -50,8 +47,8 @@ class NEwBlueProManager {
         case notPurchased
     }
     
-    var iapTypeList: [IAPType] = [.month, .year]
-    var currentIapType: IAPType = .year
+    var iapTypeList: [IAPType] = [.month, .year, .week]
+    var currentIapType: IAPType = .month
     var inSubscription: Bool = false
     var currentProducts: [NEwBlueProManager.IAPProduct] = []
     

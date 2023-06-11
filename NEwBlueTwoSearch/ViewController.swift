@@ -24,6 +24,8 @@ class ViewController: UIViewController {
         setView1()
         bluetoothBtnClick()
         //
+        let vc = NEwBlueSplGuideVC()
+        self.navigationController?.pushViewController(vc, animated: true)
 
     }
 
@@ -71,7 +73,12 @@ class ViewController: UIViewController {
             .adhere(toSuperview: view) {
                 $0.centerX.equalToSuperview()
                 $0.left.equalToSuperview().offset(24)
-                $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-34)
+                if UIScreen.isDevice8SE() {
+                    $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-14)
+                } else {
+                    $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-34)
+                }
+
                 $0.height.equalTo(80)
             }
         //
@@ -108,6 +115,7 @@ extension ViewController {
             [weak self] in
             guard let `self` = self else {return}
             DispatchQueue.main.async {
+                NEwBlueToolManager.default.stopScan()
                 self.hiddenSearchingBlueStatus()
             }
         }

@@ -26,6 +26,7 @@ class NEwBlueToolManager: NSObject {
     static let `default` = NEwBlueToolManager()
     var centralManager: CBCentralManager!
     var peripheralItemList: [NEwPeripheralItem] = []
+    
     var favoritePeripheralItemList: [NEwPeripheralItem] = []
     var otherPeripheralItemList: [NEwPeripheralItem] = []
     
@@ -41,14 +42,14 @@ class NEwBlueToolManager: NSObject {
     var currentTrackingItemRssi: Double?
     var currentTrackingItemName: String?
     
-    let slowVoice = "did_slow.mp3"
-    let fastVoice = "did_fast.mp3"
+    let slowVoice = "nb_did_slow.m4a"
+    let fastVoice = "nb_did_fast.m4a"
     
     var audioPlayer: AVAudioPlayer?
     var currentAudioType: String?
     var feedTimer: Timer?
     var pendingRefresh = false
-    
+    var startRefreshYanchi = false
     
     override init() {
         super.init()
@@ -63,13 +64,17 @@ class NEwBlueToolManager: NSObject {
         DispatchQueue.global().async {
             [weak self] in
             guard let `self` = self else {return}
+            self.startRefreshYanchi = false
+            
             self.centralManagerScan()
         }
     }
     
     func stopScan() {
         cachaedPeripheralItemList = peripheralItemList
+        
         centralManager.stopScan()
+        self.startRefreshYanchi = false
     }
     
     func centralManagerScan() {
@@ -100,6 +105,13 @@ class NEwBlueToolManager: NSObject {
                 }
             }
             
+            //
+            favoritePeripheralItemList.sort { perip1, perip2 in
+                perip1.rssi > perip2.rssi
+            }
+            otherPeripheralItemList.sort { perip1, perip2 in
+                perip1.rssi > perip2.rssi
+            }
             senddeviceFavoriteChangeNotification()
         }
     }
@@ -124,7 +136,13 @@ class NEwBlueToolManager: NSObject {
                     favoritePeripheralItemList.removeAll(item)
                 }
             }
-            
+            //
+            favoritePeripheralItemList.sort { perip1, perip2 in
+                perip1.rssi > perip2.rssi
+            }
+            otherPeripheralItemList.sort { perip1, perip2 in
+                perip1.rssi > perip2.rssi
+            }
             senddeviceFavoriteChangeNotification()
         }
     }
@@ -242,68 +260,93 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
         case .poweredOn:
             debugPrint("central.state is .poweredOn")
             self.centralManagerStatus = true
-            centralManagerScan()
+//            centralManagerScan()
         @unknown default:
             debugPrint("central.state is .@unknown default")
         }
     }
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        
-        if let deviceName = peripheral.name {
-            if let peItem = peripheralItemList.first(where: { perItem in
-                let hasSameId = perItem.identifier == peripheral.identifier.uuidString
-                let hasSameName = perItem.deviceName == peripheral.identifier.uuidString
-                return hasSameId || hasSameName
-            }) {
-                peItem.rssi = Double(truncating: RSSI)
-                debugPrint("peItem addr = \(peItem)")
-                debugPrint("peItem.rssi = \(peItem.rssi)")
+//        DispatchQueue.global().async {
+        Thread.sleep(forTimeInterval: 0.1)
+            if let deviceName = peripheral.name {
                 
-                if let currentTrack = currentTrackingItem, currentTrack.identifier == peItem.identifier {
-                    currentTrackingItemName = currentTrack.deviceName ?? ""
-                    currentTrackingItemRssi = Double(truncating: RSSI)
-                    sendTrackingDeviceNotification()
-                }
-            } else {
-                if let peItem = cachaedPeripheralItemList.first(where: { perItem in
-                    perItem.identifier == peripheral.identifier.uuidString
+                if let peItem = self.peripheralItemList.first(where: { perItem in
+                    let hasSameId = perItem.identifier == peripheral.identifier.uuidString
+                    let hasSameName = perItem.deviceName == peripheral.name
+                    return hasSameId || hasSameName
                 }) {
-                    peItem.rssi = Double(truncating: RSSI)
-                    peripheralItemList.append(peItem)
+                    
+                    debugPrint("peItem addr = \(peItem)")
+                    debugPrint("peItem.rssi = \(peItem.rssi)")
+                    if Double(truncating: RSSI) < 10 {
+                        peItem.rssi = Double(truncating: RSSI)
+                        if let currentTrack = self.currentTrackingItem, currentTrack.identifier == peItem.identifier {
+                            self.currentTrackingItemName = currentTrack.deviceName ?? ""
+                            self.currentTrackingItemRssi = Double(truncating: RSSI)
+                            self.sendTrackingDeviceNotification()
+                        }
+                    }
+                    
                 } else {
-                    let item = NEwPeripheralItem(identifier: peripheral.identifier.uuidString, deviceName: deviceName, rssi: Double(truncating: RSSI))
-                    peripheralItemList.append(item)
+                    if Double(truncating: RSSI) < 10 {
+                        if let peItem = self.cachaedPeripheralItemList.first(where: { perItem in
+                            perItem.identifier == peripheral.identifier.uuidString
+                        }) {
+                            peItem.rssi = Double(truncating: RSSI)
+                            
+                            self.peripheralItemList.append(peItem)
+                        } else {
+                            let item = NEwPeripheralItem(identifier: peripheral.identifier.uuidString, deviceName: deviceName, rssi: Double(truncating: RSSI))
+                            self.peripheralItemList.append(item)
+                        }
+                    }
+                    
+                }
+                
+                //
+                if !self.pendingRefresh {
+                    self.pendingRefresh = true
+                    var yanchiTime = 0.75
+                    if self.startRefreshYanchi == false {
+                        self.startRefreshYanchi = true
+                        yanchiTime = 0
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + yanchiTime) {
+                        [weak self] in
+                        guard let `self` = self else {return}
+                        self.self.pendingRefresh = false
+                        self.sortPeripheraByRSSI()
+                        self.sendDiscoverDeviceNotification()
+                    }
                 }
             }
-            
-            //
-            if !pendingRefresh {
-                pendingRefresh = true
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                    [weak self] in
-                    guard let `self` = self else {return}
-                    self.pendingRefresh = false
-                    self.sortPeripheraByRSSI()
-                    self.sendDiscoverDeviceNotification()
-                }
-            }
-        }
+//        }
+        
     }
     
     func sortPeripheraByRSSI() {
+        
         peripheralItemList.sort { perip1, perip2 in
             perip1.rssi > perip2.rssi
         }
         var favoriteList: [NEwPeripheralItem] = []
         var otherList: [NEwPeripheralItem] = []
+        var hasPrepearList: [NEwPeripheralItem] = []
+        var haspaixu: [String] = []
         peripheralItemList.forEach {
-            $0.updateRingProgress()
-            if self.favoriteDevicesIdList.contains($0.identifier) {
-                favoriteList.append($0)
-            } else {
-                otherList.append($0)
+//            $0.updateRingProgress()
+            if !haspaixu.contains($0.identifier) {
+                haspaixu.append($0.identifier)
+                hasPrepearList.append($0)
+                
+                if self.favoriteDevicesIdList.contains($0.identifier) {
+                    favoriteList.append($0)
+                } else {
+                    otherList.append($0)
+                }
             }
+            
         }
         
         favoritePeripheralItemList = favoriteList
@@ -339,10 +382,12 @@ class NEwPeripheralItem: Equatable {
     var identifier: String
     var deviceName: String
     var rssi: Double
-    var ringProgressView: RingProgressView = RingProgressView()
+//    var ringProgressView: RingProgressView = RingProgressView()
     
     func updateRingProgress() {
-        ringProgressView.progress = deviceDistancePercent()
+        DispatchQueue.main.async {
+//            self.ringProgressView.progress = self.deviceDistancePercent()
+        }
     }
     
     init(identifier: String, deviceName: String, rssi: Double) {
@@ -350,14 +395,17 @@ class NEwPeripheralItem: Equatable {
         self.deviceName = deviceName
         self.rssi = rssi
         //
-        ringProgressView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
-        ringProgressView.progress = deviceDistancePercent()
-        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
-        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
-        ringProgressView.backgroundRingColor = .clear
-        ringProgressView.ringWidth = 3
-        ringProgressView.shadowOpacity = 0
-        ringProgressView.hidesRingForZeroProgress = true
+        DispatchQueue.main.async {
+//            self.ringProgressView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+//            self.ringProgressView.progress = self.deviceDistancePercent()
+//            self.ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+//            self.ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+//            self.ringProgressView.backgroundRingColor = .clear
+//            self.ringProgressView.ringWidth = 3
+//            self.ringProgressView.shadowOpacity = 0
+//            self.ringProgressView.hidesRingForZeroProgress = true
+        }
+        
         
     }
     

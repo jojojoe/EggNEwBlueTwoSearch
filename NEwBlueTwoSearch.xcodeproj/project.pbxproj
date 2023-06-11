@@ -37,6 +37,12 @@
 		D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */; };
 		D8E76A232A2F70C3008BD289 /* NEwSwipeCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */; };
 		D8E76A252A321B1E008BD289 /* NEwBlueSubscribeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */; };
+		D8E76A272A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A262A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift */; };
+		D8E76A2A2A345721008BD289 /* nb_did_fast.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D8E76A282A345721008BD289 /* nb_did_fast.m4a */; };
+		D8E76A2B2A345721008BD289 /* nb_did_slow.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D8E76A292A345721008BD289 /* nb_did_slow.m4a */; };
+		D8E76A2D2A3579A7008BD289 /* NEwSplashPageOne.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A2C2A3579A7008BD289 /* NEwSplashPageOne.swift */; };
+		D8E76A2F2A3579B2008BD289 /* NEwSplashPageTwo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A2E2A3579B2008BD289 /* NEwSplashPageTwo.swift */; };
+		D8E76A312A3579BC008BD289 /* NEwSplashPageThree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A302A3579BC008BD289 /* NEwSplashPageThree.swift */; };
 		EB9B88742A333471007208D4 /* NEwBlueProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88732A333471007208D4 /* NEwBlueProManager.swift */; };
 		EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */; };
 		EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */; };
@@ -80,6 +86,12 @@
 		D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKNRingProgressView.swift; sourceTree = "<group>"; };
 		D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSwipeCollectionCell.swift; sourceTree = "<group>"; };
 		D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueSubscribeVC.swift; sourceTree = "<group>"; };
+		D8E76A262A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueMapSanjiaoView.swift; sourceTree = "<group>"; };
+		D8E76A282A345721008BD289 /* nb_did_fast.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = nb_did_fast.m4a; sourceTree = "<group>"; };
+		D8E76A292A345721008BD289 /* nb_did_slow.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = nb_did_slow.m4a; sourceTree = "<group>"; };
+		D8E76A2C2A3579A7008BD289 /* NEwSplashPageOne.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSplashPageOne.swift; sourceTree = "<group>"; };
+		D8E76A2E2A3579B2008BD289 /* NEwSplashPageTwo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSplashPageTwo.swift; sourceTree = "<group>"; };
+		D8E76A302A3579BC008BD289 /* NEwSplashPageThree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwSplashPageThree.swift; sourceTree = "<group>"; };
 		D9A85237F94174B73FA55D54 /* Pods-NEwBlueTwoSearch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NEwBlueTwoSearch.release.xcconfig"; path = "Target Support Files/Pods-NEwBlueTwoSearch/Pods-NEwBlueTwoSearch.release.xcconfig"; sourceTree = "<group>"; };
 		EB9B88732A333471007208D4 /* NEwBlueProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueProManager.swift; sourceTree = "<group>"; };
 		EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueSplGuideVC.swift; sourceTree = "<group>"; };
@@ -158,6 +170,8 @@
 				D8E76A072A2C8DE0008BD289 /* SF-Pro-Text-Bold.otf */,
 				D8E76A0D2A2C8DFD008BD289 /* SF-Pro-Text-Regular.otf */,
 				D8E76A092A2C8DEA008BD289 /* SF-Pro-Text-Heavy.otf */,
+				D8E76A282A345721008BD289 /* nb_did_fast.m4a */,
+				D8E76A292A345721008BD289 /* nb_did_slow.m4a */,
 			);
 			path = NEwBlueTwoSearch;
 			sourceTree = "<group>";
@@ -227,6 +241,10 @@
 				D8E76A182A2CB7CB008BD289 /* NEwSettingPageView.swift */,
 				D8E76A1A2A2CC375008BD289 /* NEwManualPageView.swift */,
 				D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */,
+				D8E76A262A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift */,
+				D8E76A2C2A3579A7008BD289 /* NEwSplashPageOne.swift */,
+				D8E76A2E2A3579B2008BD289 /* NEwSplashPageTwo.swift */,
+				D8E76A302A3579BC008BD289 /* NEwSplashPageThree.swift */,
 			);
 			path = PageViews;
 			sourceTree = "<group>";
@@ -320,7 +338,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8E769E42A2C6ADC008BD289 /* LaunchScreen.storyboard in Resources */,
+				D8E76A2A2A345721008BD289 /* nb_did_fast.m4a in Resources */,
 				D8E769E12A2C6ADC008BD289 /* Assets.xcassets in Resources */,
+				D8E76A2B2A345721008BD289 /* nb_did_slow.m4a in Resources */,
 				D8E76A0C2A2C8DF4008BD289 /* SF-Pro-Text-Medium.otf in Resources */,
 				D8E76A0A2A2C8DEA008BD289 /* SF-Pro-Text-Heavy.otf in Resources */,
 				D8E76A102A2C8E09008BD289 /* SF-Pro-Text-Semibold.otf in Resources */,
@@ -385,10 +405,13 @@
 				EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */,
 				D8E769F62A2C6D2F008BD289 /* KRProgressHUD.swift in Sources */,
 				EB9E45412A2F251F0068AACB /* NEwBlueDevicePostionVC.swift in Sources */,
+				D8E76A2D2A3579A7008BD289 /* NEwSplashPageOne.swift in Sources */,
 				D8E769FA2A2C6DED008BD289 /* KRActivityIndicatorViewStyle.swift in Sources */,
 				D8E76A002A2C6F23008BD289 /* SwiftyTimer.swift in Sources */,
 				D8E76A042A2C872C008BD289 /* UIView+ConfigChain.swift in Sources */,
 				D8E769FD2A2C6E94008BD289 /* Device.generated.swift in Sources */,
+				D8E76A2F2A3579B2008BD289 /* NEwSplashPageTwo.swift in Sources */,
+				D8E76A272A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift in Sources */,
 				EB9B88742A333471007208D4 /* NEwBlueProManager.swift in Sources */,
 				D8E76A252A321B1E008BD289 /* NEwBlueSubscribeVC.swift in Sources */,
 				D8E769F42A2C6D2F008BD289 /* KRHudExtensions.swift in Sources */,
@@ -402,6 +425,7 @@
 				D8E76A152A2C9965008BD289 /* NEwHomePageView.swift in Sources */,
 				D8E76A192A2CB7CB008BD289 /* NEwSettingPageView.swift in Sources */,
 				D8E76A122A2C8F59008BD289 /* NEwBlueToolManager.swift in Sources */,
+				D8E76A312A3579BC008BD289 /* NEwSplashPageThree.swift in Sources */,
 				D8E769DA2A2C6ADA008BD289 /* SceneDelegate.swift in Sources */,
 				D8E769F52A2C6D2F008BD289 /* KRProgressHUDIconType.swift in Sources */,
 				EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */,
@@ -553,7 +577,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 97Y24FFSPP;
+				DEVELOPMENT_TEAM = 53ADUL6525;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
@@ -575,7 +599,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xx.888888;
+				PRODUCT_BUNDLE_IDENTIFIER = com.superegg.okeydokey;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -594,7 +618,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 97Y24FFSPP;
+				DEVELOPMENT_TEAM = 53ADUL6525;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
@@ -616,7 +640,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xx.888888;
+				PRODUCT_BUNDLE_IDENTIFIER = com.superegg.okeydokey;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

@@ -10,8 +10,11 @@ import UIKit
 class NEwBlueDeviceListVC: UIViewController {
     
     var collection: UICollectionView!
-    let cellSize: CGSize = CGSize(width: UIScreen.main.bounds.width - 24 * 2, height: 78)
+    let cellSize: CGSize = CGSize(width: UIScreen.main.bounds.width - 24 * 2, height: 80)
     var restartClickBlock: (()->Void)?
+    var ringProgressViewList: [String:RingProgressView] = [:]
+    
+    
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -47,6 +50,7 @@ class NEwBlueDeviceListVC: UIViewController {
             self.collection.reloadData()
         }
     }
+    
     func setupContentV() {
         view.clipsToBounds = true
         view.backgroundColor(UIColor(hexString: "#F1F4FF")!)
@@ -54,7 +58,7 @@ class NEwBlueDeviceListVC: UIViewController {
         let backButton = UIButton()
         
         backButton.adhere(toSuperview: view) {
-            $0.left.equalToSuperview().offset(20)
+            $0.left.equalToSuperview().offset(10)
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.width.height.equalTo(44)
         }
@@ -70,8 +74,8 @@ class NEwBlueDeviceListVC: UIViewController {
         }
         .lineBreakMode(.byTruncatingTail)
         .text("Connect Device")
-        .color(UIColor(hexString: "#242766")!)
-        .font(UIFont.SFProTextBold, 22)
+        .color(UIColor(hexString: "#262B55")!)
+        .font(UIFont.SFProTextBold, 20)
         .textAlignment(.center)
         
         
@@ -88,7 +92,7 @@ class NEwBlueDeviceListVC: UIViewController {
         collection.snp.makeConstraints {
             $0.right.left.equalToSuperview()
             $0.top.equalTo(backButton.snp.bottom).offset(8)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-70)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-80)
         }
         collection.register(cellWithClass: NEwDeviceListCell.self)
         collection.register(supplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withClass: NEwBlueDeviceHeader.self)
@@ -125,6 +129,20 @@ class NEwBlueDeviceListVC: UIViewController {
             self.dismiss(animated: true, completion: nil)
         }
     }
+    
+    
+    func setupRingProgressV() -> RingProgressView {
+        let ringProgressView = RingProgressView()
+        ringProgressView.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
+        ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+        ringProgressView.backgroundRingColor = .clear
+        ringProgressView.ringWidth = 3
+        ringProgressView.shadowOpacity = 0
+        ringProgressView.hidesRingForZeroProgress = true
+        ringProgressView.progress = 0
+        return ringProgressView
+    }
 }
 
 
@@ -152,8 +170,19 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
             }
 
         }
-        if let item = periphItem {
-            cell.updateItemContentStatus(peripheralItem: item)
+        if let preitem = periphItem {
+            cell.updateItemContentStatus(peripheralItem: preitem)
+            
+            //
+            var rinigV = ringProgressViewList[preitem.identifier]
+            if rinigV == nil {
+                rinigV = setupRingProgressV()
+                ringProgressViewList[preitem.identifier] = rinigV
+            }
+            cell.iconbgV.removeSubviews()
+            cell.iconbgV.addSubview(rinigV!)
+            rinigV!.progress = preitem.deviceDistancePercent()
+            
         }
         
         
@@ -167,9 +196,12 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
                     } else {
                         NEwBlueToolManager.default.removeUserFavorite(deviceId: deviceid)
                     }
+                    cell.contentView.alpha = 1
+                    cell.backgroundColor = .white
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
                         [weak self] in
                         guard let `self` = self else {return}
+
                         self.collection.reloadData()
                     }
                     
@@ -221,7 +253,7 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let bottomOffset: CGFloat = 160
+        let bottomOffset: CGFloat = 20
         if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
             return UIEdgeInsets(top: 10, left: 24, bottom: bottomOffset, right: 24)
         } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
@@ -320,8 +352,10 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegate {
     }
     
     func showDeviceInfoContent(peripheralItem: NEwPeripheralItem) {
-        
+        let vc = NEwBlueDeviceContentVC(peripheral: peripheralItem)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
+    
 }
 
 
@@ -337,16 +371,16 @@ class NEwBlueDeviceHeader: UICollectionReusableView {
     }
     
     func setupView() {
-        self.addSubview(tiNameLabel)
-        tiNameLabel.font = UIFont(name: "Poppins-Bold", size: 20)
-        tiNameLabel.textColor = UIColor(hexString: "#242766")
-        tiNameLabel.textAlignment = .left
-        tiNameLabel.snp.makeConstraints {
+        tiNameLabel.adhere(toSuperview: self) {
             $0.left.equalToSuperview().offset(24)
             $0.centerY.equalToSuperview()
             $0.width.greaterThanOrEqualTo(10)
             $0.height.greaterThanOrEqualTo(24)
         }
+        .font(UIFont.SFProTextBold, 18)
+        .color(UIColor(hexString: "#262B55")!)
+        .textAlignment(.left)
+        
     }
     
 }
@@ -469,7 +503,7 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
     let deviceNameLabel = UILabel()
     let destanceLabel = UILabel()
     let iconbgV = UIView()
-    
+    let ringProgressView: RingProgressView = RingProgressView()
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -506,7 +540,7 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         //
         deviceIconImgV.contentMode = .scaleAspectFit
         deviceIconImgV.clipsToBounds = true
-        iconbgV.addSubview(deviceIconImgV)
+        contentBgV.addSubview(deviceIconImgV)
         deviceIconImgV.snp.makeConstraints {
             $0.center.equalTo(iconbgV)
             $0.width.height.equalTo(30)
@@ -551,14 +585,32 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         }
         
         //
-        favoButton = UIButton(frame: CGRect(x: 0, y: 0, width: 90, height: self.bounds.height))
+//        216 × 160
+        favoButton = UIButton(frame: CGRect(x: 0, y: 0, width: 216/2, height: self.bounds.height))
         favoButton.layer.cornerRadius = 20
         favoButton.setBackgroundImage(UIImage(named: "cell_heart_n"), for: .normal)
         favoButton.setBackgroundImage(UIImage(named: "cell_heart_s"), for: .selected)
         favoButton.roundCorners([.topRight, .bottomRight], radius: 20)
         favoButton.addTarget(self, action: #selector(favoButtonSelf(sender: )), for: .touchUpInside)
         self.revealView = favoButton
+        
+        
+        //
+//        setupRingProgressV()
     }
+    
+//    func setupRingProgressV() {
+//        self.ringProgressView.frame = CGRect(x: 0, y: 0, width: 48, height: 48)
+////        self.ringProgressView.progress = self.deviceDistancePercent()
+//        self.ringProgressView.startColor = UIColor(hexString: "#3971FF")!
+//        self.ringProgressView.endColor = UIColor(hexString: "#3971FF")!
+//        self.ringProgressView.backgroundRingColor = .clear
+//        self.ringProgressView.ringWidth = 3
+//        self.ringProgressView.shadowOpacity = 0
+//        self.ringProgressView.hidesRingForZeroProgress = true
+//        self.ringProgressView.progress = 0
+//        self.iconbgV.addSubview(self.ringProgressView)
+//    }
     
     @objc func favoButtonSelf(sender: UIButton) {
         sender.isSelected = !sender.isSelected
@@ -580,14 +632,24 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         deviceIconImgV.image = UIImage(named: deviceIconStr)
         deviceNameLabel.text = deviceNameStr
         destanceLabel.text = distanceAproxStr
+//        self.ringProgressView.progress = peripheralItem.deviceDistancePercent()
         
-        if self.iconbgV != peripheralItem.ringProgressView.superview {
-            
-        }
-        
-        let ringBound = CGRect(x: 0, y: 0, width: 48, height: 48)
-        peripheralItem.ringProgressView.frame = ringBound
-        self.iconbgV.addSubview(peripheralItem.ringProgressView)
+//        if self.iconbgV != peripheralItem.ringProgressView.superview {
+//            self.iconbgV.removeSubviews()
+//            let ringBound = CGRect(x: 0, y: 0, width: 48, height: 48)
+//            peripheralItem.ringProgressView.frame = ringBound
+//            self.iconbgV.addSubview(peripheralItem.ringProgressView)
+////            peripheralItem.ringProgressView.progress = peripheralItem.deviceDistancePercent()
+//        }
+//        peripheralItem.ringProgressView.progress = peripheralItem.deviceDistancePercent()
+//
+//        if self.iconbgV != peripheralItem.ringProgressView.superview {
+//
+//        }
+//
+//        let ringBound = CGRect(x: 0, y: 0, width: 48, height: 48)
+//        peripheralItem.ringProgressView.frame = ringBound
+//        self.iconbgV.addSubview(peripheralItem.ringProgressView)
         
     }
     
