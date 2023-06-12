@@ -24,10 +24,12 @@ class ViewController: UIViewController {
         setView1()
         bluetoothBtnClick()
         //
-        let vc = NEwBlueSplGuideVC()
-        self.navigationController?.pushViewController(vc, animated: true)
+//        let vc = NEwBlueSplGuideVC()
+//        self.navigationController?.pushViewController(vc, animated: true)
 
     }
+    
+    
 
     func setView1() {
         view.clipsToBounds()

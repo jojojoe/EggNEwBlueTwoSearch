@@ -12,6 +12,7 @@ class NEwHomePageView: UIView {
     var startScanBlock: (()->Void)?
     let scanCenterBgV = NEwCenterScanView()
     let tiLabel = UILabel()
+    let probtn = UIButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,6 +21,10 @@ class NEwHomePageView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func updateSubscribeStatus() {
+        probtn.isHidden = true
     }
     
     func showSearchingStatus(isShow: Bool) {
@@ -45,16 +50,7 @@ class NEwHomePageView: UIView {
     }
     
     func setupV() {
-        //
-        let probtn = UIButton()
-            .image(UIImage(named: "homepro"))
-            .adhere(toSuperview: self) {
-                $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(20)
-                $0.right.equalToSuperview().offset(-24)
-                $0.width.equalTo(78)
-                $0.height.equalTo(34)
-            }
-            .target(target: self, action: #selector(probtnClick), event: .touchUpInside)
+        
         //
         
         tiLabel
@@ -63,11 +59,23 @@ class NEwHomePageView: UIView {
             .font(UIFont.SFProTextHeavy, 20)
             .adhere(toSuperview: self) {
                 $0.left.equalToSuperview().offset(24)
-                $0.centerY.equalTo(probtn.snp.centerY).offset(0)
+//                $0.centerY.equalTo(probtn.snp.centerY).offset(0)
+                $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(22)
                 $0.width.greaterThanOrEqualTo(10)
                 $0.height.equalTo(34)
             }
+        
         //
+        probtn
+            .image(UIImage(named: "homepro"))
+            .adhere(toSuperview: self) {
+                $0.centerY.equalTo(tiLabel.snp.centerY).offset(0)
+                $0.right.equalToSuperview().offset(-24)
+                $0.width.equalTo(78)
+                $0.height.equalTo(34)
+            }
+            .target(target: self, action: #selector(probtnClick), event: .touchUpInside)
+        
         let centerBgV = UIView()
         centerBgV.adhere(toSuperview: self) {
             $0.left.right.equalToSuperview()

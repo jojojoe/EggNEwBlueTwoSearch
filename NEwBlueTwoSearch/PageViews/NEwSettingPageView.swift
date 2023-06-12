@@ -10,14 +10,31 @@ import UIKit
 class NEwSettingPageView: UIView {
 
     var fatherFuVC: UIViewController?
+    let wangguanBg = UIView()
+    let shareBgImgV = UIImageView()
+    let restoreBg = UIView()
+    let btnW: CGFloat = UIScreen.main.bounds.size.width - 24 * 2
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupV()
+        updateSubscribeStatus()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func updateSubscribeStatus() {
+        wangguanBg.isHidden = true
+        shareBgImgV.snp.remakeConstraints({
+            $0.left.equalToSuperview().offset(24)
+            $0.top.equalTo(wangguanBg.snp.top).offset(0)
+            $0.width.equalTo(btnW)
+            $0.height.equalTo(btnW * 128.0/342)
+        })
+        restoreBg.isHidden = true
+            
     }
     
     func setupV() {
@@ -46,28 +63,34 @@ class NEwSettingPageView: UIView {
         //
         let scrollW: CGFloat = UIScreen.main.bounds.size.width
         scrollV.contentSize = CGSize(width: scrollW, height: 385)
-        let btnW: CGFloat = UIScreen.main.bounds.size.width - 24 * 2
-        //
-        let wangguanBgImgV = UIImageView()
-            .image("settingbtn1banner")
+        
+        
+        wangguanBg
             .adhere(toSuperview: scrollV) {
                 $0.left.equalToSuperview().offset(24)
                 $0.top.equalToSuperview().offset(10)
                 $0.width.equalTo(btnW)
                 $0.height.equalTo(btnW * 64.0/342)
             }
+        //
+        let wangguanBgImgV = UIImageView()
+            .image("settingbtn1banner")
+            .adhere(toSuperview: wangguanBg) {
+                $0.left.right.top.bottom.equalTo(wangguanBg)
+            }
             
         let wangguanBtn = NEwSettingBtn(frame: .zero, iconStr: "wangguan", titStr: "To Unlock All Features")
-            .adhere(toSuperview: scrollV) {
-                $0.left.right.top.bottom.equalTo(wangguanBgImgV)
+            .adhere(toSuperview: wangguanBg) {
+                $0.left.right.top.bottom.equalTo(wangguanBg)
             }
             .target(target: self, action: #selector(wangguanBtnClick), event: .touchUpInside)
         //
-        let shareBgImgV = UIImageView()
+        
+        shareBgImgV
             .image("settingbtn2banner")
             .adhere(toSuperview: scrollV) {
                 $0.left.equalToSuperview().offset(24)
-                $0.top.equalTo(wangguanBgImgV.snp.bottom).offset(20)
+                $0.top.equalTo(wangguanBg.snp.bottom).offset(20)
                 $0.width.equalTo(btnW)
                 $0.height.equalTo(btnW * 128.0/342)
             }
@@ -110,18 +133,24 @@ class NEwSettingPageView: UIView {
             .target(target: self, action: #selector(termsofBtnClick), event: .touchUpInside)
         
         //
-        let restoreBgImgV = UIImageView()
-            .image("settingbtn1banner")
+        
+        restoreBg
             .adhere(toSuperview: scrollV) {
                 $0.left.equalToSuperview().offset(24)
                 $0.top.equalTo(privacyBgImgV.snp.bottom).offset(20)
                 $0.width.equalTo(btnW)
                 $0.height.equalTo(btnW * 64.0/342)
             }
+        //
+        let restoreBgImgV = UIImageView()
+            .image("settingbtn1banner")
+            .adhere(toSuperview: restoreBg) {
+                $0.left.right.top.bottom.equalTo(restoreBg)
+            }
             
         let restoreBtn = NEwSettingBtn(frame: .zero, iconStr: "restoreset", titStr: "Restore")
-            .adhere(toSuperview: scrollV) {
-                $0.left.right.top.bottom.equalTo(restoreBgImgV)
+            .adhere(toSuperview: restoreBg) {
+                $0.left.right.top.bottom.equalTo(restoreBg)
             }
             .target(target: self, action: #selector(restoreBtnClick), event: .touchUpInside)
         
