@@ -111,7 +111,7 @@ class NEwBlueDeviceContentVC: UIViewController {
         
         if !refreshWating {
             refreshWating = true
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
                 [weak self] in
                 guard let `self` = self else {return}
                 self.refreshWating = false
@@ -300,7 +300,7 @@ extension NEwBlueDeviceContentVC {
     
     func setupCenterDeviceView() {
         //
-        let leftPadding: CGFloat = 20
+        let leftPadding: CGFloat = 45
         var canvasVWidth = centerV.bounds.size.width - leftPadding * 2
         if canvasVWidth > centerV.bounds.size.height {
             canvasVWidth = centerV.bounds.size.height
@@ -337,7 +337,8 @@ extension NEwBlueDeviceContentVC {
         ringProgressView.backgroundRingColor = .clear
         ringProgressView.hidesRingForZeroProgress = true
         ringProgressView.shadowOpacity = 0
-        ringProgressView.progress = 0
+        ringProgressView.progress = peripheralItem.deviceDistancePercent()
+        persentLabel.text = peripheralItem.deviceDistancePercentStr()
         
         
     }
