@@ -74,7 +74,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     
     @objc func deviceFavoriteChange(notification: Notification) {
         DispatchQueue.main.async {
-            if NEwBlueToolManager.default.favoriteDevicesIdList.contains(self.peripheralItem.identifier) {
+            if NEwBlueToolManager.default.hotBlueDevicesIdList.contains(self.peripheralItem.identifier) {
                 self.favoriteHotBtn.isSelected = true
             } else {
                 self.favoriteHotBtn.isSelected = false
@@ -142,7 +142,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     
     
     func updateFavoriteStatus() {
-        if NEwBlueToolManager.default.favoriteDevicesIdList.contains(peripheralItem.identifier) {
+        if NEwBlueToolManager.default.hotBlueDevicesIdList.contains(peripheralItem.identifier) {
             favoriteHotBtn.isSelected = true
         } else {
             favoriteHotBtn.isSelected = false
@@ -165,7 +165,7 @@ extension NEwBlueDeviceContentVC {
 extension NEwBlueDeviceContentVC {
     func trackStatusChange(isTracking: Bool) {
         if isTracking {
-            NEwBlueToolManager.default.addUserFavorite(deviceId: peripheralItem.identifier)
+            NEwBlueToolManager.default.appendUserFavoriteBlueDevice(deviceId: peripheralItem.identifier)
         } else {
             NEwBlueToolManager.default.removeUserFavorite(deviceId: peripheralItem.identifier)
         }

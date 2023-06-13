@@ -136,7 +136,7 @@ class NEwBlueDevicePostionVC: UIViewController {
         .target(target: self, action: #selector(favoriteBtnClick(sender: )), event: .touchUpInside)
         
         //
-        if NEwBlueToolManager.default.favoriteDevicesIdList.contains(self.bluetoothDevice.identifier) {
+        if NEwBlueToolManager.default.hotBlueDevicesIdList.contains(self.bluetoothDevice.identifier) {
             self.favoriteHotBtn.isSelected = true
         } else {
             self.favoriteHotBtn.isSelected = false
@@ -239,7 +239,7 @@ class NEwBlueDevicePostionVC: UIViewController {
     
     func trackStatusChange(isTracking: Bool) {
         if isTracking {
-            NEwBlueToolManager.default.addUserFavorite(deviceId: bluetoothDevice.identifier)
+            NEwBlueToolManager.default.appendUserFavoriteBlueDevice(deviceId: bluetoothDevice.identifier)
         } else {
             NEwBlueToolManager.default.removeUserFavorite(deviceId: bluetoothDevice.identifier)
         }

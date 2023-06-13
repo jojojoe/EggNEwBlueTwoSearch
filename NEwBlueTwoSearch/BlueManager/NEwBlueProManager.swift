@@ -16,6 +16,19 @@ class NEwBlueProManager {
     public static var `default` = NEwBlueProManager()
     
     
+    public enum NwVerifyLocalSubscriptionResult {
+        case notPurchased
+        case purchasedOnceTime
+        case expired(expiryDate: Date, items: [InAppReceipt])
+        case purchased(expiryDate: Date, items: [InAppReceipt])
+    }
+    
+    var inSubscription: Bool = false
+    var currentProducts: [NEwBlueProManager.IAPProduct] = []
+    var iapTypeList: [IAPType] = [.month, .year, .week]
+    var currentIapType: IAPType = .month
+    
+    
     public enum IAPType: String {
         case week = "com.find.cellphones.week"
         case month = "com.find.cellphones.month"
@@ -40,18 +53,153 @@ class NEwBlueProManager {
         case error(error: IARError)
     }
 
-    public enum VerifyLocalSubscriptionResult {
-        case purchased(expiryDate: Date, items: [InAppReceipt])
-        case expired(expiryDate: Date, items: [InAppReceipt])
-        case purchasedOnceTime
-        case notPurchased
+}
+
+extension NEwBlueProManager {
+    // main method to check if purchased anything
+    func isPurchased(completion: @escaping (_ purchased: Bool) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var validPurchases: [String: NwVerifyLocalSubscriptionResult] = [:]
+        var errors: [String: Error] = [:]
+        for key in iapTypeList {
+            dispatchGroup.enter()
+            
+            verifyPurchase(key) { [weak self] purchaseResult, error in
+                guard let _ = self else {
+                    dispatchGroup.leave()
+                    return
+                }
+                if let err = error {
+                    errors[key.rawValue] = err
+                    dispatchGroup.leave()
+                    return
+                }
+                guard let purchase = purchaseResult else {
+                    dispatchGroup.leave()
+                    return
+                }
+                switch purchase {
+                case .purchased(let expiryDate, let receiptItems):
+                    let now = Date()
+                    if now < expiryDate {
+                        validPurchases[key.rawValue] = purchase
+                    }
+                    validPurchases[key.rawValue] = purchase
+                    dispatchGroup.leave()
+                case .expired(let expiryDate, let receiptItems):
+                    print("Product is expired since \(expiryDate)")
+                    dispatchGroup.leave()
+                    let format = DateFormatter()
+                    format.timeZone = .current
+                    format.dateFormat = "EEEE, MMM d, yyyy h:mm a"
+                    let dateString = format.string(from: expiryDate)
+                    debugPrint("dateString = \(dateString)")
+                case .purchasedOnceTime:
+                    validPurchases[key.rawValue] = purchase
+                    dispatchGroup.leave()
+                case .notPurchased:
+                    dispatchGroup.leave()
+                    
+                }
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            let hasValid = validPurchases.count > 0
+            NEwBlueProManager.default.inSubscription = hasValid
+            completion(hasValid)
+        }
     }
     
-    var iapTypeList: [IAPType] = [.month, .year, .week]
-    var currentIapType: IAPType = .month
-    var inSubscription: Bool = false
-    var currentProducts: [NEwBlueProManager.IAPProduct] = []
+    func verifyPurchase(_ purchase: IAPType,
+                        completion: @escaping(NwVerifyLocalSubscriptionResult?, Error?) -> Void) {
+     
+        verifyReceipt { [weak self] (receiptResult, validationError) in
+            if let error = validationError {
+                completion(nil, error)
+                return
+            }
+            guard let result = receiptResult else {
+                completion(nil, nil)
+                return
+            }
+            guard let _ = self else {
+                completion(nil, nil)
+                return
+            }
+            //
+            switch result {
+            // receipt is validated
+            case .success(let receipt):
+                let oneTimePurchase = "life"//IAPType.life.rawValue
+                let item = receipt.purchases.first {
+                    return $0.productIdentifier == oneTimePurchase
+                }
+                if let _ = item {
+                    completion(.purchasedOnceTime, nil)
+                    return
+                }
+                let productId = purchase.rawValue
+                // check there is a subscription first
+                if let subscription = receipt.activeAutoRenewableSubscriptionPurchases(ofProductIdentifier: productId, forDate: Date()) {
+                    if let expiryDate = subscription.subscriptionExpirationDate {
+                        completion(.purchased(expiryDate: expiryDate, items: [receipt] ), nil)
+                        return
+                    }
+                    // no expiry date?
+                    completion(.notPurchased, nil)
+                }
+                let purchases = receipt.purchases( ofProductIdentifier: productId ) { (InAppPurchase, InAppPurchase2) -> Bool in
+                    return InAppPurchase.purchaseDate > InAppPurchase2.purchaseDate
+                }
+                if purchases.isEmpty {
+                    completion(.notPurchased, nil)
+                } else {
+                    // get last purchase
+                    let lastSubscription = purchases[0]
+                    completion( .expired(expiryDate: lastSubscription.subscriptionExpirationDate ?? Date(), items: [receipt] ), nil )
+                }
+            // validation error
+            case .error(let error):
+                completion(nil, error)
+            }
+        }
+    }
     
+    func verifyReceipt( completion: @escaping(VerifyLocalReceiptResult?, Error?) -> Void ) {
+        do {
+            let receipt = try InAppReceipt.localReceipt()
+            do {
+                try receipt.verifyHash()
+                completion(.success(receipt: receipt), nil)
+            } catch IARError.initializationFailed(let reason) {
+                completion(.error(error: .initializationFailed(reason: reason)),nil)
+            } catch IARError.validationFailed(let reason) {
+                completion(.error(error: IARError.validationFailed(reason: reason)), nil)
+            } catch IARError.purchaseExpired {
+                completion(.error(error: .purchaseExpired), nil)
+            } catch {
+                // unknown error
+                completion(nil, error)
+            }
+        } catch {
+            completion(
+                .error(error: .initializationFailed(reason: .appStoreReceiptNotFound)),
+                error
+            )
+        }
+    }
+    
+    func refreshReceipt(completion: @escaping(FetchReceiptResult?, Error?) -> Void) {
+        SwiftyStoreKit.fetchReceipt(forceRefresh: true, completion: { result in
+            switch result {
+            case .success:
+               completion(result, nil)
+            case .error(let error):
+                completion(nil, error)
+            }
+        })
+    }
 }
 
 extension NEwBlueProManager {
@@ -146,153 +294,5 @@ extension NEwBlueProManager {
                 
             }
         }
-    }
-}
-
-extension NEwBlueProManager {
-    // main method to check if purchased anything
-    func isPurchased(completion: @escaping (_ purchased: Bool) -> Void) {
-        let dispatchGroup = DispatchGroup()
-        var validPurchases: [String: VerifyLocalSubscriptionResult] = [:]
-        var errors: [String: Error] = [:]
-        for key in iapTypeList {
-            dispatchGroup.enter()
-            
-            verifyPurchase(key) { [weak self] purchaseResult, error in
-                guard let _ = self else {
-                    dispatchGroup.leave()
-                    return
-                }
-                if let err = error {
-                    errors[key.rawValue] = err
-                    dispatchGroup.leave()
-                    return
-                }
-                guard let purchase = purchaseResult else {
-                    dispatchGroup.leave()
-                    return
-                }
-                switch purchase {
-                case .purchased(let expiryDate, let receiptItems):
-                    let now = Date()
-                    if now < expiryDate {
-                        validPurchases[key.rawValue] = purchase
-                    }
-                    validPurchases[key.rawValue] = purchase
-                    dispatchGroup.leave()
-                case .expired(let expiryDate, let receiptItems):
-                    print("Product is expired since \(expiryDate)")
-                    dispatchGroup.leave()
-                    let format = DateFormatter()
-                    format.timeZone = .current
-                    format.dateFormat = "EEEE, MMM d, yyyy h:mm a"
-                    let dateString = format.string(from: expiryDate)
-                    debugPrint("dateString = \(dateString)")
-                case .purchasedOnceTime:
-                    validPurchases[key.rawValue] = purchase
-                    dispatchGroup.leave()
-                case .notPurchased:
-                    dispatchGroup.leave()
-                    
-                }
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            let hasValid = validPurchases.count > 0
-            NEwBlueProManager.default.inSubscription = hasValid
-            completion(hasValid)
-        }
-    }
-    
-    func verifyPurchase(_ purchase: IAPType,
-                        completion: @escaping(VerifyLocalSubscriptionResult?, Error?) -> Void) {
-     
-        verifyReceipt { [weak self] (receiptResult, validationError) in
-            guard let _ = self else {
-                completion(nil, nil)
-                return
-            }
-            if let error = validationError {
-                completion(nil, error)
-                return
-            }
-            guard let result = receiptResult else {
-                completion(nil, nil)
-                return
-            }
-            
-            switch result {
-            // receipt is validated
-            case .success(let receipt):
-                let oneTimePurchase = "life"//IAPType.life.rawValue
-                let item = receipt.purchases.first {
-                    return $0.productIdentifier == oneTimePurchase
-                }
-                if let _ = item {
-                    completion(.purchasedOnceTime, nil)
-                    return
-                }
-                
-                let productId = purchase.rawValue
-                // check there is a subscription first
-                if let subscription = receipt.activeAutoRenewableSubscriptionPurchases(ofProductIdentifier: productId, forDate: Date()) {
-                    if let expiryDate = subscription.subscriptionExpirationDate {
-                        completion(.purchased(expiryDate: expiryDate, items: [receipt] ), nil)
-                        return
-                    }
-                    // no expiry date?
-                    completion(.notPurchased, nil)
-                }
-                let purchases = receipt.purchases( ofProductIdentifier: productId ) { (InAppPurchase, InAppPurchase2) -> Bool in
-                    return InAppPurchase.purchaseDate > InAppPurchase2.purchaseDate
-                }
-                if purchases.isEmpty {
-                    completion(.notPurchased, nil)
-                } else {
-                    // get last purchase
-                    let lastSubscription = purchases[0]
-                    completion( .expired(expiryDate: lastSubscription.subscriptionExpirationDate ?? Date(), items: [receipt] ), nil )
-                }
-            // validation error
-            case .error(let error):
-                completion(nil, error)
-            }
-        }
-    }
-    
-    func verifyReceipt( completion: @escaping(VerifyLocalReceiptResult?, Error?) -> Void ) {
-        do {
-            let receipt = try InAppReceipt.localReceipt()
-            do {
-                try receipt.verifyHash()
-                completion(.success(receipt: receipt), nil)
-            } catch IARError.initializationFailed(let reason) {
-                completion(.error(error: .initializationFailed(reason: reason)),nil)
-            } catch IARError.validationFailed(let reason) {
-                completion(.error(error: IARError.validationFailed(reason: reason)), nil)
-            } catch IARError.purchaseExpired {
-                completion(.error(error: .purchaseExpired), nil)
-            } catch {
-                // unknown error
-                completion(nil, error)
-            }
-        } catch {
-            completion(
-                .error(error: .initializationFailed(reason: .appStoreReceiptNotFound)),
-                error
-            )
-        }
-    }
-    
-    func refreshReceipt(completion: @escaping(FetchReceiptResult?, Error?) -> Void) {
-        SwiftyStoreKit.fetchReceipt(forceRefresh: true, completion: { result in
-            switch result {
-            case .success:
-               completion(result, nil)
-            case .error(let error):
-                completion(nil, error)
-            }
-        })
     }
 }

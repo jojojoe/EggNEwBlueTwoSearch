@@ -10,7 +10,7 @@ import UIKit
 import CoreBluetooth
 import AVFoundation
 import AudioToolbox
-
+import MessageUI
 
 class NEwBlueToolManager: NSObject {
     //
@@ -27,13 +27,13 @@ class NEwBlueToolManager: NSObject {
     var centralManager: CBCentralManager!
     var peripheralItemList: [NEwPeripheralItem] = []
     
-    var favoritePeripheralItemList: [NEwPeripheralItem] = []
-    var otherPeripheralItemList: [NEwPeripheralItem] = []
+    var favoHotPeriItemsList: [NEwPeripheralItem] = []
+    var unotherPeriItemsList: [NEwPeripheralItem] = []
     
     var cachaedPeripheralItemList: [NEwPeripheralItem] = []
     let queue = DispatchQueue(label: "fetchqueue", qos: .background)
     var deviceBluetoothDeniedBlock: (()->Void)?
-    var favoriteDevicesIdList: [String] = []
+    var hotBlueDevicesIdList: [String] = []
     var centralManagerStatus: Bool?
     let discoverDeviceNotiName: NSNotification.Name = NSNotification.Name.init("not_ScaningDeviceUpdate")
     let trackingDeviceNotiName: NSNotification.Name = NSNotification.Name.init("trackingDeviceUpdate")
@@ -82,14 +82,14 @@ class NEwBlueToolManager: NSObject {
    }
    
     func fetchUserFavorites() {
-        favoriteDevicesIdList = UserDefaults.standard.object(forKey: "ud_favoriteDevicesId") as? [String] ?? []
-        debugPrint("favoriteDevicesIdList = \(favoriteDevicesIdList.count)")
+        hotBlueDevicesIdList = UserDefaults.standard.object(forKey: "nebud_favoriteHotBlueDevicesId") as? [String] ?? []
+        debugPrint("favoriteDevicesIdList = \(hotBlueDevicesIdList.count)")
     }
     
-    func addUserFavorite(deviceId: String) {
-        if !favoriteDevicesIdList.contains(deviceId) {
-            favoriteDevicesIdList.append(deviceId)
-            UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
+    func appendUserFavoriteBlueDevice(deviceId: String) {
+        if !hotBlueDevicesIdList.contains(deviceId) {
+            hotBlueDevicesIdList.append(deviceId)
+            UserDefaults.standard.set(hotBlueDevicesIdList, forKey: "nebud_favoriteHotBlueDevicesId")
             UserDefaults.standard.synchronize()
             
             let peri = peripheralItemList.first { ite in
@@ -97,31 +97,31 @@ class NEwBlueToolManager: NSObject {
             }
           
             if let item = peri {
-                if !favoritePeripheralItemList.contains(item) {
-                    favoritePeripheralItemList.append(item)
+                if !favoHotPeriItemsList.contains(item) {
+                    favoHotPeriItemsList.append(item)
                 }
-                if otherPeripheralItemList.contains(item) {
-                    otherPeripheralItemList.removeAll(item)
+                if unotherPeriItemsList.contains(item) {
+                    unotherPeriItemsList.removeAll(item)
                 }
             }
             
             //
-            favoritePeripheralItemList.sort { perip1, perip2 in
+            favoHotPeriItemsList.sort { perip1, perip2 in
                 perip1.rssi > perip2.rssi
             }
-            otherPeripheralItemList.sort { perip1, perip2 in
+            unotherPeriItemsList.sort { perip1, perip2 in
                 perip1.rssi > perip2.rssi
             }
-            senddeviceFavoriteChangeNotification()
+            sendBlueFavoriteChangeNotification()
         }
     }
     
     func removeUserFavorite(deviceId: String) {
-        if favoriteDevicesIdList.contains(deviceId) {
-            favoriteDevicesIdList.removeAll { item in
+        if hotBlueDevicesIdList.contains(deviceId) {
+            hotBlueDevicesIdList.removeAll { item in
                 item == deviceId
             }
-            UserDefaults.standard.set(favoriteDevicesIdList, forKey: "ud_favoriteDevicesId")
+            UserDefaults.standard.set(hotBlueDevicesIdList, forKey: "nebud_favoriteHotBlueDevicesId")
             UserDefaults.standard.synchronize()
             
             let peri = peripheralItemList.first { ite in
@@ -129,26 +129,70 @@ class NEwBlueToolManager: NSObject {
             }
           
             if let item = peri {
-                if !otherPeripheralItemList.contains(item) {
-                    otherPeripheralItemList.append(item)
+                if !unotherPeriItemsList.contains(item) {
+                    unotherPeriItemsList.append(item)
                 }
-                if favoritePeripheralItemList.contains(item) {
-                    favoritePeripheralItemList.removeAll(item)
+                if favoHotPeriItemsList.contains(item) {
+                    favoHotPeriItemsList.removeAll(item)
                 }
             }
             //
-            favoritePeripheralItemList.sort { perip1, perip2 in
+            favoHotPeriItemsList.sort { perip1, perip2 in
                 perip1.rssi > perip2.rssi
             }
-            otherPeripheralItemList.sort { perip1, perip2 in
+            unotherPeriItemsList.sort { perip1, perip2 in
                 perip1.rssi > perip2.rssi
             }
-            senddeviceFavoriteChangeNotification()
+            sendBlueFavoriteChangeNotification()
         }
     }
 }
 
- 
+extension NEwBlueToolManager: MFMailComposeViewControllerDelegate {
+    func enterLinPrivacyPage() {
+        if let url = URL(string: privacyStr) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    func enterLinTermsPage() {
+        if let url = URL(string: termsStr) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+    }
+    
+    func enterShareFriends(fuVC: UIViewController) {
+        
+        let shareStr = "Share with friends:\(shareUrl)"
+        let activityItems = [shareStr] as [Any]
+        let activc = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        fuVC.present(activc, animated: true)
+    }
+    
+    func enterFeedback(fuVC: UIViewController) {
+        if MFMailComposeViewController.canSendMail() {
+            let modelName = Device.current.description
+            let systemVersion = UIDevice.current.systemVersion
+            let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Find Headphone"
+            let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+            let controller = MFMailComposeViewController()
+            controller.setSubject("\(appName) Feedback")
+            controller.mailComposeDelegate = self
+            controller.setToRecipients([feedbackStr])
+            controller.setMessageBody("\n\n\nSystem Version：\(systemVersion)\n Device Name：\(modelName)\n App Name：\(appName)\n App Version：\(appVersion )", isHTML: false)
+            fuVC.present(controller, animated: true, completion: nil)
+        } else {
+            KRProgressHUD.showError(withMessage: "The device doesn't support email")
+        }
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+}
 
 extension NEwBlueToolManager {
     func audioSlowVoiceStyle() -> String {
@@ -247,7 +291,7 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
         NotificationCenter.default.post(name: trackingDeviceNotiName, object: nil)
     }
     
-    func senddeviceFavoriteChangeNotification() {
+    func sendBlueFavoriteChangeNotification() {
         NotificationCenter.default.post(name: deviceFavoriteChangeNotiName, object: nil)
     }
     
@@ -340,7 +384,7 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
                 haspaixu.append($0.identifier)
                 hasPrepearList.append($0)
                 
-                if self.favoriteDevicesIdList.contains($0.identifier) {
+                if self.hotBlueDevicesIdList.contains($0.identifier) {
                     favoriteList.append($0)
                 } else {
                     otherList.append($0)
@@ -349,8 +393,8 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
             
         }
         
-        favoritePeripheralItemList = favoriteList
-        otherPeripheralItemList = otherList
+        favoHotPeriItemsList = favoriteList
+        unotherPeriItemsList = otherList
         
     }
     

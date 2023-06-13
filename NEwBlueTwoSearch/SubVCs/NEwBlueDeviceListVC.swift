@@ -153,19 +153,19 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withClass: NEwDeviceListCell.self, for: indexPath)
          
         var periphItem: NEwPeripheralItem?
-        if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
-            periphItem = NEwBlueToolManager.default.otherPeripheralItemList[indexPath.item]
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
-            periphItem = NEwBlueToolManager.default.favoritePeripheralItemList[indexPath.item]
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
+            periphItem = NEwBlueToolManager.default.unotherPeriItemsList[indexPath.item]
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
+            periphItem = NEwBlueToolManager.default.favoHotPeriItemsList[indexPath.item]
             cell.favoButton.isSelected = true
         } else {
             if indexPath.section == 0 {
-                periphItem = NEwBlueToolManager.default.favoritePeripheralItemList[indexPath.item]
+                periphItem = NEwBlueToolManager.default.favoHotPeriItemsList[indexPath.item]
                 cell.favoButton.isSelected = true
             } else {
-                periphItem = NEwBlueToolManager.default.otherPeripheralItemList[indexPath.item]
+                periphItem = NEwBlueToolManager.default.unotherPeriItemsList[indexPath.item]
                 cell.favoButton.isSelected = false
             }
 
@@ -192,7 +192,7 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
             DispatchQueue.main.async {
                 if deviceid.count >= 1 {
                     if favoStatus {
-                        NEwBlueToolManager.default.addUserFavorite(deviceId: deviceid)
+                        NEwBlueToolManager.default.appendUserFavoriteBlueDevice(deviceId: deviceid)
                     } else {
                         NEwBlueToolManager.default.removeUserFavorite(deviceId: deviceid)
                     }
@@ -215,28 +215,28 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             return 0
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
-            return NEwBlueToolManager.default.otherPeripheralItemList.count
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
-            return NEwBlueToolManager.default.favoritePeripheralItemList.count
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
+            return NEwBlueToolManager.default.unotherPeriItemsList.count
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
+            return NEwBlueToolManager.default.favoHotPeriItemsList.count
         } else {
             if section == 0 {
-                return NEwBlueToolManager.default.favoritePeripheralItemList.count
+                return NEwBlueToolManager.default.favoHotPeriItemsList.count
             } else {
-                return NEwBlueToolManager.default.otherPeripheralItemList.count
+                return NEwBlueToolManager.default.unotherPeriItemsList.count
             }
         }
         return 0
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             return 0
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
             return 1
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             return 1
         } else {
             return 2
@@ -254,11 +254,11 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let bottomOffset: CGFloat = 20
-        if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             return UIEdgeInsets(top: 10, left: 24, bottom: bottomOffset, right: 24)
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
             return UIEdgeInsets(top: 10, left: 24, bottom: bottomOffset, right: 24)
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             return UIEdgeInsets(top: 10, left: 24, bottom: bottomOffset, right: 24)
         } else {
             if section == 0 {
@@ -281,11 +281,11 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegateFlowLayout {
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             return CGSize(width: 0, height: 0)
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
             return CGSize(width: 0, height: 0)
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             if section == 0 {
                 return CGSize(width: UIScreen.main.bounds.size.width, height: 64)
             } else {
@@ -301,11 +301,11 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegateFlowLayout {
         if kind == UICollectionView.elementKindSectionHeader {
             
             let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withClass: NEwBlueDeviceHeader.self, for: indexPath)
-            if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+            if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
 
-            } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
+            } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
                 
-            } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+            } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
                 if indexPath.section == 0 {
                     view.tiNameLabel.text = "My Devices"
                 }
@@ -327,17 +327,17 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         var periphItem: NEwPeripheralItem?
-        if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
+        if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
             
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count == 0 && NEwBlueToolManager.default.otherPeripheralItemList.count != 0 {
-            periphItem = NEwBlueToolManager.default.otherPeripheralItemList[indexPath.item]
-        } else if NEwBlueToolManager.default.favoritePeripheralItemList.count != 0 && NEwBlueToolManager.default.otherPeripheralItemList.count == 0 {
-            periphItem = NEwBlueToolManager.default.favoritePeripheralItemList[indexPath.item]
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count != 0 {
+            periphItem = NEwBlueToolManager.default.unotherPeriItemsList[indexPath.item]
+        } else if NEwBlueToolManager.default.favoHotPeriItemsList.count != 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {
+            periphItem = NEwBlueToolManager.default.favoHotPeriItemsList[indexPath.item]
         } else {
             if indexPath.section == 0 {
-                periphItem = NEwBlueToolManager.default.favoritePeripheralItemList[indexPath.item]
+                periphItem = NEwBlueToolManager.default.favoHotPeriItemsList[indexPath.item]
             } else {
-                periphItem = NEwBlueToolManager.default.otherPeripheralItemList[indexPath.item]
+                periphItem = NEwBlueToolManager.default.unotherPeriItemsList[indexPath.item]
             }
         }
         

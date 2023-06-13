@@ -73,13 +73,13 @@ class NEwSettingPageView: UIView {
                 $0.height.equalTo(btnW * 64.0/342)
             }
         //
-        let wangguanBgImgV = UIImageView()
+        let _ = UIImageView()
             .image("settingbtn1banner")
             .adhere(toSuperview: wangguanBg) {
                 $0.left.right.top.bottom.equalTo(wangguanBg)
             }
             
-        let wangguanBtn = NEwSettingBtn(frame: .zero, iconStr: "wangguan", titStr: "To Unlock All Features")
+        let _ = NEwSettingBtn(frame: .zero, iconStr: "wangguan", titStr: "To Unlock All Features")
             .adhere(toSuperview: wangguanBg) {
                 $0.left.right.top.bottom.equalTo(wangguanBg)
             }
@@ -95,14 +95,14 @@ class NEwSettingPageView: UIView {
                 $0.height.equalTo(btnW * 128.0/342)
             }
         //
-        let shareBtn = NEwSettingBtn(frame: .zero, iconStr: "share", titStr: "Share")
+        let _ = NEwSettingBtn(frame: .zero, iconStr: "share", titStr: "Share")
             .adhere(toSuperview: scrollV) {
                 $0.left.right.top.equalTo(shareBgImgV)
                 $0.height.equalTo(68)
             }
             .target(target: self, action: #selector(shareappBtnClick), event: .touchUpInside)
         //
-        let morehelpFeedBtn = NEwSettingBtn(frame: .zero, iconStr: "filequestion", titStr: "More Help")
+        let _ = NEwSettingBtn(frame: .zero, iconStr: "filequestion", titStr: "More Help")
             .adhere(toSuperview: scrollV) {
                 $0.left.right.bottom.equalTo(shareBgImgV)
                 $0.height.equalTo(68)
@@ -118,14 +118,14 @@ class NEwSettingPageView: UIView {
                 $0.height.equalTo(btnW * 128.0/342)
             }
         //
-        let privacyBtn = NEwSettingBtn(frame: .zero, iconStr: "lockaltpri", titStr: "Privacy Policy")
+        let _ = NEwSettingBtn(frame: .zero, iconStr: "lockaltpri", titStr: "Privacy Policy")
             .adhere(toSuperview: scrollV) {
                 $0.left.right.top.equalTo(privacyBgImgV)
                 $0.height.equalTo(68)
             }
             .target(target: self, action: #selector(privacyBtnClick), event: .touchUpInside)
         //
-        let termsBtn = NEwSettingBtn(frame: .zero, iconStr: "filealtterms", titStr: "Terms of Use")
+        let _ = NEwSettingBtn(frame: .zero, iconStr: "filealtterms", titStr: "Terms of Use")
             .adhere(toSuperview: scrollV) {
                 $0.left.right.bottom.equalTo(privacyBgImgV)
                 $0.height.equalTo(68)
@@ -142,19 +142,17 @@ class NEwSettingPageView: UIView {
                 $0.height.equalTo(btnW * 64.0/342)
             }
         //
-        let restoreBgImgV = UIImageView()
+        let _ = UIImageView()
             .image("settingbtn1banner")
             .adhere(toSuperview: restoreBg) {
                 $0.left.right.top.bottom.equalTo(restoreBg)
             }
             
-        let restoreBtn = NEwSettingBtn(frame: .zero, iconStr: "restoreset", titStr: "Restore")
+        let _ = NEwSettingBtn(frame: .zero, iconStr: "restoreset", titStr: "Restore")
             .adhere(toSuperview: restoreBg) {
                 $0.left.right.top.bottom.equalTo(restoreBg)
             }
             .target(target: self, action: #selector(restoreBtnClick), event: .touchUpInside)
-        
-        
         
     }
 
@@ -162,27 +160,46 @@ class NEwSettingPageView: UIView {
 
 extension NEwSettingPageView {
     @objc func wangguanBtnClick() {
-        
+        if let vc = self.fatherFuVC {
+            let subscribe = NEwBlueSubscribeVC()
+            subscribe.modalPresentationStyle = .fullScreen
+            vc.present(subscribe, animated: true)
+        }
     }
     
     @objc func shareappBtnClick() {
-        
+        if let vc = self.fatherFuVC {
+            NEwBlueToolManager.default.enterShareFriends(fuVC: vc)
+        }
     }
     
     @objc func morehelpFeedBtnClick() {
-        
+        if let vc = self.fatherFuVC {
+            NEwBlueToolManager.default.enterFeedback(fuVC: vc)
+        }
     }
     
     @objc func privacyBtnClick() {
-        
+        NEwBlueToolManager.default.enterLinPrivacyPage()
     }
     
     @objc func termsofBtnClick() {
-        
+        NEwBlueToolManager.default.enterLinTermsPage()
     }
     
     @objc func restoreBtnClick() {
         
+        if NEwBlueProManager.default.inSubscription {
+            KRProgressHUD.showSuccess(withMessage: "You are already in the subscription period!")
+        } else {
+            NEwBlueProManager.default.restore { success in
+                if success {
+                    KRProgressHUD.showSuccess(withMessage: "The subscription was restored successfully")
+                } else {
+                    KRProgressHUD.showMessage("Nothing to Restore")
+                }
+            }
+        }
     }
 }
 
