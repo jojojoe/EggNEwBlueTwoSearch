@@ -17,6 +17,7 @@ class NEwHomePageView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupV()
+        updateSubscribeStatus()
     }
     
     required init?(coder: NSCoder) {
