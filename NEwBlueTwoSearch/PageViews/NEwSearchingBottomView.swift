@@ -2,7 +2,7 @@
 //  NEwSearchingBottomView.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/4.
+//  Created by sege li on 2023/6/4.
 //
 
 import UIKit
@@ -31,24 +31,38 @@ class NEwSearchingBottomView: UIView {
     
     func showContentStatus(isShow: Bool) {
         var alphav: CGFloat = 0
+        var framev: CGRect = CGRect.zero
         if isShow {
             alphav = 1
-            bottomV.snp.remakeConstraints {
-                $0.left.right.equalToSuperview()
-                $0.top.equalTo(self.snp.top).offset(65)
-                $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
-            }
+            framev = CGRect(x: 0, y: 60, width: self.frame.size.width, height: self.frame.size.height)
+//            bottomV.snp.remakeConstraints {
+//                $0.left.right.equalToSuperview()
+//                $0.top.equalTo(self.snp.top).offset(65)
+//
+//                if UIScreen.isDevice8SEPaid() {
+//                    $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
+//                } else {
+//                    $0.height.equalTo(UIScreen.main.bounds.size.height * 3/4)
+//                }
+//            }
         } else {
-            bottomV.snp.remakeConstraints {
-                $0.left.right.equalToSuperview()
-                $0.top.equalTo(self.snp.bottom).offset(30)
-                $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
-                
-            }
+            framev = CGRect(x: 0, y: self.frame.size.height, width: self.frame.size.width, height: self.frame.size.height)
+//            bottomV.snp.remakeConstraints {
+//                $0.left.right.equalToSuperview()
+//                $0.top.equalTo(self.snp.bottom).offset(30)
+//
+//                if UIScreen.isDevice8SEPaid() {
+//                    $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
+//                } else {
+//                    $0.height.equalTo(UIScreen.main.bounds.size.height * 3/4)
+//                }
+//
+//            }
         }
         UIView.animate(withDuration: 0.35, delay: 0) {
             self.setNeedsLayout()
             self.layoutIfNeeded()
+            self.bottomV.frame = framev
             self.titLabel1.alpha = alphav
             self.titLabel2.alpha = alphav
         }
@@ -86,13 +100,19 @@ class NEwSearchingBottomView: UIView {
         titLabel1.alpha = 0
         titLabel2.alpha = 0
         //
+        bottomV.frame = CGRect(x: 0, y: self.frame.size.height, width: self.frame.size.width, height: self.frame.size.height)
         addSubview(bottomV)
-        bottomV.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.width.equalTo(UIScreen.main.bounds.size.width)
-            $0.top.equalTo(self.snp.bottom).offset(30)
-            $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
-        }
+//        bottomV.snp.makeConstraints {
+//            if UIScreen.isDevice8SEPaid() {
+//                $0.height.equalTo(UIScreen.main.bounds.size.height / 2 + 40)
+//            } else {
+//                $0.height.equalTo(UIScreen.main.bounds.size.height * 3/4)
+//            }
+//            $0.centerX.equalToSuperview()
+//            $0.width.equalTo(UIScreen.main.bounds.size.width)
+//            $0.top.equalTo(self.snp.bottom).offset(30)
+//
+//        }
         bottomV
             .cornerRadius(30, masksToBounds: false)
             .shadow(color: UIColor(hexString: "#385EE5"), radius: 20, opacity: 0.3, offset: CGSize(width: 0, height: 0), path: nil)
@@ -115,7 +135,7 @@ class NEwSearchingBottomView: UIView {
         }
         .text("Searching...")
         .font(UIFont.SFProTextSemibold, 16)
-        .color(.white)
+        .color(.white.withAlphaComponent(0.7))
         
         //
         let closeBtn = UIButton()
@@ -137,11 +157,23 @@ class NEwSearchingBottomView: UIView {
         collection.delegate = self
         collection.dataSource = self
         bottomV.addSubview(collection)
-        collection.snp.makeConstraints {
-            $0.top.equalTo(closeBtn.snp.bottom).offset(5)
-            $0.right.left.equalToSuperview()
-            $0.height.equalTo(UIScreen.main.bounds.size.height / 2 - 70 - 70)
+        
+        var colleFrame = CGRect(x: 0, y: 44, width: self.frame.size.width, height: self.frame.size.height - 44 - 60 - 50)
+        if UIScreen.isDeviceHasBottomSafeAre() {
+            colleFrame = CGRect(x: 0, y: 44, width: self.frame.size.width, height: self.frame.size.height - 44 - 60 - 50 - 24)
         }
+        collection.frame = colleFrame
+        
+//        collection.snp.makeConstraints {
+//            $0.top.equalTo(closeBtn.snp.bottom).offset(5)
+//            $0.right.left.equalToSuperview()
+//
+//            if UIScreen.isDevice8SEPaid() {
+//                $0.height.equalTo(UIScreen.main.bounds.size.height / 2 - 70 - 70)
+//            } else {
+//                $0.height.equalTo(UIScreen.main.bounds.size.height * 3/4 - 40 - 60 - 60)
+//            }
+//        }
         collection.register(cellWithClass: NEwSearchingItemCell.self)
         //
         deviceContentBtn.adhere(toSuperview: bottomV) {
@@ -180,7 +212,7 @@ class NEwSearchingBottomView: UIView {
                 $0.centerY.equalToSuperview().offset(-50)
                 $0.width.height.equalTo(120)
             }
-        let noDeviLabe = UILabel()
+        let _ = UILabel()
             .adhere(toSuperview: noDeviceBgV) {
                 $0.centerX.equalToSuperview()
                 $0.top.equalTo(noDeviImgV.snp.bottom).offset(20)
@@ -192,11 +224,14 @@ class NEwSearchingBottomView: UIView {
             .textAlignment(.center)
         
         self.noDeviceBgV.isHidden = true
-//        if NEwBlueToolManager.default.peripheralItemList.count == 0 {
-//            self.noDeviceBgV.isHidden = false
-//        } else {
-//            self.noDeviceBgV.isHidden = true
-//        }
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+            if NEwBlueToolManager.default.bluePeripheralList.count == 0 {
+                self.noDeviceBgV.isHidden = false
+            } else {
+                self.noDeviceBgV.isHidden = true
+            }
+        }
+        
     }
 
 }
@@ -204,17 +239,19 @@ class NEwSearchingBottomView: UIView {
 extension NEwSearchingBottomView {
     
     @objc func closeBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         closeClickBlock?()
     }
     
     @objc func deviceContentBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         devicesContentClickBlock?()
     }
 
     
     func setupRingProgressV() -> RingProgressView {
         let ringProgressView = RingProgressView()
-        ringProgressView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        ringProgressView.frame = CGRect(x: 0, y: 0, width: 62, height: 62)
         ringProgressView.startColor = UIColor(hexString: "#3971FF")!
         ringProgressView.endColor = UIColor(hexString: "#3971FF")!
         ringProgressView.backgroundRingColor = .clear
@@ -237,8 +274,8 @@ extension NEwSearchingBottomView: UICollectionViewDataSource {
             rinigV = setupRingProgressV()
             ringProgressViewList[preitem.identifier] = rinigV
         }
-        cell.iconbgV.removeSubviews()
-        cell.iconbgV.addSubview(rinigV!)
+        cell.ringBgV.removeSubviews()
+        cell.ringBgV.addSubview(rinigV!)
         rinigV!.progress = preitem.blueDeviceDistancePercentDouble()
         
         return cell
@@ -261,7 +298,7 @@ extension NEwSearchingBottomView: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)
+        return UIEdgeInsets(top: 6, left: 0, bottom: 8, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -276,6 +313,7 @@ extension NEwSearchingBottomView: UICollectionViewDelegateFlowLayout {
 
 extension NEwSearchingBottomView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        NEwBlueToolManager.default.giveTapVib()
         let preitem = NEwBlueToolManager.default.bluePeripheralList[indexPath.item]
         itemclickBlock?(preitem)
     }
@@ -293,7 +331,7 @@ class NEwSearchingItemCell: UICollectionViewCell {
     let deviceNameLabel = UILabel()
     let distanceLabel = UILabel()
     let iconbgV = UIView()
-    
+    let ringBgV = UIView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -309,8 +347,9 @@ class NEwSearchingItemCell: UICollectionViewCell {
         contentView.addSubview(iconbgV)
         iconbgV.backgroundColor = UIColor(hexString: "#E8EDFF")
         let cellW: CGFloat = CGFloat(Int((UIScreen.main.bounds.size.width - 1) / 3))
-        iconbgV.frame = CGRect(x: (cellW - 60)/2, y: 0, width: 60, height: 60)
-        iconbgV.layer.cornerRadius = 30
+        let iconW: CGFloat = 62
+        iconbgV.frame = CGRect(x: (cellW - iconW)/2, y: 0, width: iconW, height: iconW)
+        iconbgV.layer.cornerRadius = iconW/2
         iconbgV.clipsToBounds = false
         //
         deviceIconImgV.contentMode = .scaleAspectFit
@@ -318,9 +357,10 @@ class NEwSearchingItemCell: UICollectionViewCell {
         contentView.addSubview(deviceIconImgV)
         deviceIconImgV.snp.makeConstraints {
             $0.center.equalTo(iconbgV)
-            $0.top.left.equalToSuperview().offset(12)
+            $0.width.height.equalTo(iconW)
         }
-        
+        deviceIconImgV.backgroundColor(UIColor(hexString: "#E3E8FB")!)
+            .cornerRadius((iconW - 2)/2)
         //
         deviceNameLabel.font = UIFont(name: UIFont.SFProTextSemibold, size: 14)
         deviceNameLabel.textColor = UIColor(hexString: "#262B55")
@@ -354,6 +394,12 @@ class NEwSearchingItemCell: UICollectionViewCell {
         
         //
         
+        ringBgV
+            .adhere(toSuperview: contentView) {
+                $0.left.right.top.bottom.equalTo(iconbgV)
+            }
+            .backgroundColor(.clear)
+        ringBgV.isUserInteractionEnabled = false
     }
     
     

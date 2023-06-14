@@ -2,7 +2,7 @@
 //  NEwBlueSubscribeVC.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/8.
+//  Created by sege li on 2023/6/8.
 //
 
 import UIKit
@@ -337,6 +337,7 @@ class NEwBlueSubscribeVC: UIViewController {
 extension NEwBlueSubscribeVC {
     
     @objc func weekProBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         weekProBtn.isSelected = true
         monthProBtn.isSelected = false
         yearProBtn.isSelected = false
@@ -344,6 +345,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func monthProBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         weekProBtn.isSelected = false
         monthProBtn.isSelected = true
         yearProBtn.isSelected = false
@@ -351,6 +353,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func yearProBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         weekProBtn.isSelected = false
         monthProBtn.isSelected = false
         yearProBtn.isSelected = true
@@ -358,6 +361,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func proContinueBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         NEwBlueProManager.default.subscribeProvipOrder(iapType: NEwBlueProManager.default.currentIapType, source: "shop") {[weak self] subSuccess, errorStr in
             guard let `self` = self else {return}
             DispatchQueue.main.async {
@@ -374,6 +378,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func backButtonClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -382,6 +387,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func termsBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if let url = URL(string: NEwBlueToolManager.default.termsStr) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -390,6 +396,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func privacyBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if let url = URL(string: NEwBlueToolManager.default.privacyStr) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -398,6 +405,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func restoreButtonClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if NEwBlueProManager.default.inSubscription {
             KRProgressHUD.showSuccess(withMessage: "You are already in the subscription period!")
         } else {

@@ -2,7 +2,7 @@
 //  NEwSettingPageView.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/4.
+//  Created by sege li on 2023/6/4.
 //
 
 import UIKit
@@ -160,6 +160,7 @@ class NEwSettingPageView: UIView {
 
 extension NEwSettingPageView {
     @objc func wangguanBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if let vc = self.fatherFuVC {
             let subscribe = NEwBlueSubscribeVC()
             subscribe.modalPresentationStyle = .fullScreen
@@ -168,27 +169,31 @@ extension NEwSettingPageView {
     }
     
     @objc func shareappBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if let vc = self.fatherFuVC {
             NEwBlueToolManager.default.enterShareFriends(fuVC: vc)
         }
     }
     
     @objc func morehelpFeedBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if let vc = self.fatherFuVC {
             NEwBlueToolManager.default.enterFeedback(fuVC: vc)
         }
     }
     
     @objc func privacyBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         NEwBlueToolManager.default.enterLinPrivacyPage()
     }
     
     @objc func termsofBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         NEwBlueToolManager.default.enterLinTermsPage()
     }
     
     @objc func restoreBtnClick() {
-        
+        NEwBlueToolManager.default.giveTapVib()
         if NEwBlueProManager.default.inSubscription {
             KRProgressHUD.showSuccess(withMessage: "You are already in the subscription period!")
         } else {

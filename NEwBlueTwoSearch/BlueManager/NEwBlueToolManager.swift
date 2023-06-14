@@ -2,7 +2,7 @@
 //  NEwBlueToolManager.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/4.
+//  Created by sege li on 2023/6/4.
 //
 
 import Foundation
@@ -21,7 +21,7 @@ class NEwBlueToolManager: NSObject {
     let privacyStr = "https://sites.google.com/view/findheadphone-privacypolicy/home"
     
     var isSplashBegin: Bool = false
-    
+    let feedvImpact = UIImpactFeedbackGenerator.init(style: .light)
     //
     static let `default` = NEwBlueToolManager()
     var centralManager: CBCentralManager!
@@ -54,6 +54,9 @@ class NEwBlueToolManager: NSObject {
         fetchUserFavorites()
     }
     
+    func giveTapVib() {
+        feedvImpact.impactOccurred()
+    }
 }
 
 extension NEwBlueToolManager {

@@ -2,7 +2,7 @@
 //  UseExtension.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/4.
+//  Created by sege li on 2023/6/4.
 //
 
 import UIKit
@@ -116,6 +116,13 @@ extension UIScreen {
             return true
         }
         return false
+    }
+    
+    static func isDeviceHasBottomSafeAre() -> Bool {
+        if Device.current.diagonal <= 4.7 || Device.current.diagonal == 5.5 || Device.current.diagonal >= 7.0 {
+            return false
+        }
+        return true
     }
     
     static func isDevice8Plus() -> Bool {

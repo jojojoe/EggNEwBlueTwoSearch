@@ -2,7 +2,7 @@
 //  NEwBlueSplGuideVC.swift
 //  NEwBlueTwoSearch
 //
-//  Created by JOJO on 2023/6/9.
+//  Created by sege li on 2023/6/9.
 //
 
 import UIKit
@@ -46,6 +46,7 @@ class NEwBlueSplGuideVC: UIViewController {
     }
     
     func continueBtnClickAction() {
+        NEwBlueToolManager.default.giveTapVib()
         if currentIndexP.item == 2 {
             continueCloseBlock?()
             debugPrint("currentIndexP = close")

@@ -2,7 +2,7 @@
 //  NEwBlueDeviceContentVC.swift
 //  NEwBlueTwoSearch
 //
-//  Created by JOJO on 2023/6/6.
+//  Created by sege li on 2023/6/6.
 //
 
 import UIKit
@@ -215,7 +215,7 @@ extension NEwBlueDeviceContentVC {
             if UIScreen.isDevice8SE() {
                 $0.bottom.equalToSuperview().offset(-15)
             } else {
-                $0.bottom.equalToSuperview().offset(-25)
+                $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-30)
             }
             
             $0.width.equalTo(326)
@@ -345,7 +345,7 @@ extension NEwBlueDeviceContentVC {
     
     
     @objc func backBClick() {
-        
+        NEwBlueToolManager.default.giveTapVib()
         NEwBlueToolManager.default.stopAudio()
         NEwBlueToolManager.default.stopVibTimer()
         NEwBlueToolManager.default.stopScan()
@@ -358,11 +358,13 @@ extension NEwBlueDeviceContentVC {
     }
     
     @objc func founditBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         backBClick()
          
     }
     
     @objc func vibBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         vibBtn.isSelected = !vibBtn.isSelected
         if vibBtn.isSelected == true {
             NEwBlueToolManager.default.playFeedVib()
@@ -373,6 +375,7 @@ extension NEwBlueDeviceContentVC {
     }
     
     @objc func positionBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
 //        if !NEwBlueToolManager.default.inSubscription {
 //            userSubscriVC()
 //        } else {
@@ -383,6 +386,7 @@ extension NEwBlueDeviceContentVC {
     }
     
     @objc func favoriteBtnClick(sender: UIButton) {
+        NEwBlueToolManager.default.giveTapVib()
         sender.isSelected = !sender.isSelected
         if sender.isSelected == true {
             trackStatusChange(isTracking: true)
@@ -393,6 +397,7 @@ extension NEwBlueDeviceContentVC {
     }
     
     @objc func voiceBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         voiceBtn.isSelected = !voiceBtn.isSelected
         if voiceBtn.isSelected == true {
             NEwBlueToolManager.default.playAudio()

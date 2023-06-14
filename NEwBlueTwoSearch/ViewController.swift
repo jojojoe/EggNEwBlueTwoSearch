@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/4.
+//  Created by sege li on 2023/6/4.
 //
 
 import UIKit
@@ -102,12 +102,28 @@ extension ViewController {
     func showSearchingBlueStatus() {
         
         //
-        let searchingBottomPage = NEwSearchingBottomView()
-        self.searchingBottomPage = searchingBottomPage
-        searchingBottomPage.adhere(toSuperview: view) {
-            $0.left.right.bottom.equalToSuperview()
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.centerY).offset(-50)
+        var bottomFrame = CGRect.zero
+        if UIScreen.isDevice8SEPaid() {
+            let frameY: CGFloat = CGRectGetMaxY(self.homePage.tiLabel.frame) + 150
+            let frameH: CGFloat = UIScreen.main.bounds.size.height - frameY
+            bottomFrame = CGRect(x: 0, y: frameY, width: UIScreen.main.bounds.size.width, height: frameH)
+        } else {
+            let frameY: CGFloat = CGRectGetMaxY(self.homePage.tiLabel.frame) + 244
+            let frameH: CGFloat = UIScreen.main.bounds.size.height - frameY
+            bottomFrame = CGRect(x: 0, y: frameY, width: UIScreen.main.bounds.size.width, height: frameH)
         }
+        let searchingBottomPage = NEwSearchingBottomView(frame: bottomFrame)
+        self.searchingBottomPage = searchingBottomPage
+        view.addSubview(searchingBottomPage)
+//        searchingBottomPage.adhere(toSuperview: view) {
+//            $0.left.right.bottom.equalToSuperview()
+//            if UIScreen.isDevice8SEPaid() {
+//                $0.top.equalTo(view.safeAreaLayoutGuide.snp.centerY).offset(-50)
+//            } else {
+//                $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(UIScreen.main.bounds.size.height * 1/4)
+//            }
+//
+//        }
         searchingBottomPage.closeClickBlock = {
             [weak self] in
             guard let `self` = self else {return}
@@ -201,11 +217,27 @@ extension ViewController {
             NEwBlueToolManager.default.startScan()
             showSearchingBlueStatus()
         } else {
-            showBlueDeniedV()
+//            showBlueDeniedV()
+            
+            //Test
+            #if DEBUG
+            let item1 = NEwPeripheralItem(identifier: "1", deviceName: "mac", rssi: -59)
+            let item2 = NEwPeripheralItem(identifier: "2", deviceName: "phone", rssi: -59)
+            let item3 = NEwPeripheralItem(identifier: "3", deviceName: "pods", rssi: -59)
+            NEwBlueToolManager.default.bluePeripheralList = [item1, item2, item3]
+            showSearchingBlueStatus()
+            
+            NEwBlueToolManager.default.sendTrackingDeviceNotification()
+            
+            #endif
+            
+            
+            
         }
     }
     
     @objc func bluetoothBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         homePage.isHidden = false
         manualPage.isHidden = true
         settingPage.isHidden = true
@@ -216,6 +248,7 @@ extension ViewController {
     }
     
     @objc func manualBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         homePage.isHidden = true
         manualPage.isHidden = false
         settingPage.isHidden = true
@@ -226,6 +259,7 @@ extension ViewController {
     }
     
     @objc func settingBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         homePage.isHidden = true
         manualPage.isHidden = true
         settingPage.isHidden = false

@@ -2,7 +2,7 @@
 //  NEwBlueDevicePostionVC.swift
 //  NEwBlueTwoSearch
 //
-//  Created by JOJO on 2023/6/6.
+//  Created by sege li on 2023/6/6.
 //
 
 import UIKit
@@ -147,7 +147,7 @@ class NEwBlueDevicePostionVC: UIViewController {
     
     func setupSearchAgainV() {
         //
-        let bottomBar = UIView(frame: CGRect(x: 0, y: UIScreen.main.bounds.size.height - 200, width: UIScreen.main.bounds.size.width, height: 200))
+        let bottomBar = UIView(frame: CGRect(x: 0, y: UIScreen.main.bounds.size.height - 240, width: UIScreen.main.bounds.size.width, height: 240))
             .backgroundColor(UIColor(hexString: "#F1F4FF")!)
             .shadow(color: UIColor(hexString: "#385EE5")!, radius: 30, opacity: 0.3, offset: CGSize(width: 0, height: 0), path: nil)
         bottomBar.roundCorners([.topLeft, .topRight], radius: 20)
@@ -176,24 +176,13 @@ class NEwBlueDevicePostionVC: UIViewController {
             .color(UIColor(hexString: "#262B55")!)
             .font(UIFont.SFProTextBold, 16)
         
-        //
-        infoPostionLabel.adhere(toSuperview: bottomBar) {
-            $0.left.equalToSuperview().offset(30)
-            $0.right.equalToSuperview().offset(-30)
-            $0.top.equalTo(infoDevNameLabel.snp.bottom).offset(0)
-            $0.height.equalTo(50)
-        }
-        .color(UIColor(hexString: "#262B55")!.withAlphaComponent(0.5))
-        .font(UIFont.SFProTextRegular, 12)
-        .numberOfLines(0)
-        .textAlignment(.left)
-        .adjustsFontSizeToFitWidth()
+        
         //
         let founditBtn = UIButton()
             .adhere(toSuperview: bottomBar) {
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(326)
-                $0.top.equalTo(infoPostionLabel.snp.bottom).offset(5)
+                $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-30)
                 $0.height.equalTo(60)
             }
             .backgroundImage(UIImage(named: "restartbutton"))
@@ -201,16 +190,28 @@ class NEwBlueDevicePostionVC: UIViewController {
             .titleColor(.white)
             .title("I Found It!")
             .target(target: self, action: #selector(founditBtnClick), event: .touchUpInside)
-        
+        //
+        infoPostionLabel.adhere(toSuperview: bottomBar) {
+            $0.left.equalToSuperview().offset(30)
+            $0.right.equalToSuperview().offset(-30)
+            $0.top.equalTo(infoDevNameLabel.snp.bottom).offset(5)
+            $0.bottom.equalTo(founditBtn.snp.top).offset(-5)
+        }
+        .color(UIColor(hexString: "#262B55")!.withAlphaComponent(0.5))
+        .font(UIFont.SFProTextRegular, 12)
+        .numberOfLines(0)
+        .textAlignment(.left)
+        .adjustsFontSizeToFitWidth()
         
     }
 
     
     @objc func bottomBarCloseBtnClick() {
-        
+        NEwBlueToolManager.default.giveTapVib()
     }
     
     @objc func backBClick(sender: UIButton) {
+        NEwBlueToolManager.default.giveTapVib()
         if self.navigationController != nil {
             self.navigationController?.popViewController()
         } else {
@@ -219,15 +220,16 @@ class NEwBlueDevicePostionVC: UIViewController {
     }
     
     @objc func founditBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if self.navigationController != nil {
             self.navigationController?.popViewController()
         } else {
             self.dismiss(animated: true, completion: nil)
         }
-         
     }
     
     @objc func favoriteBtnClick(sender: UIButton) {
+        NEwBlueToolManager.default.giveTapVib()
         sender.isSelected = !sender.isSelected
         if sender.isSelected == true {
             trackStatusChange(isTracking: true)

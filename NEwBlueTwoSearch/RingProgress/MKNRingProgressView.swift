@@ -2,7 +2,7 @@
 //  MKNRingProgressView.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/5.
+//  Created by sege li on 2023/6/5.
 //
 
 import Foundation

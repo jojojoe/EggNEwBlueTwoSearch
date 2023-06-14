@@ -2,7 +2,7 @@
 //  NEwBlueDeviceListVC.swift
 //  NEwBlueTwoSearch
 //
-//  Created by JOJO on 2023/6/6.
+//  Created by sege li on 2023/6/6.
 //
 
 import UIKit
@@ -92,7 +92,7 @@ class NEwBlueDeviceListVC: UIViewController {
         collection.snp.makeConstraints {
             $0.right.left.equalToSuperview()
             $0.top.equalTo(backButton.snp.bottom).offset(8)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-80)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-95)
         }
         collection.register(cellWithClass: NEwDeviceListCell.self)
         collection.register(supplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withClass: NEwBlueDeviceHeader.self)
@@ -114,6 +114,7 @@ class NEwBlueDeviceListVC: UIViewController {
     }
     
     @objc func backBClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -122,6 +123,7 @@ class NEwBlueDeviceListVC: UIViewController {
     }
     
     @objc func restartBtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         restartClickBlock?()
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
@@ -190,6 +192,7 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
             [weak self] favoStatus, deviceid in
             guard let `self` = self else {return}
             DispatchQueue.main.async {
+                NEwBlueToolManager.default.giveTapVib()
                 if deviceid.count >= 1 {
                     if favoStatus {
                         NEwBlueToolManager.default.appendUserFavoriteBlueDevice(deviceId: deviceid)
@@ -198,7 +201,7 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
                     }
                     cell.contentView.alpha = 1
                     cell.backgroundColor = .white
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) {
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.15) {
                         [weak self] in
                         guard let `self` = self else {return}
 
@@ -325,6 +328,7 @@ extension NEwBlueDeviceListVC: UICollectionViewDelegateFlowLayout {
 
 extension NEwBlueDeviceListVC: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        NEwBlueToolManager.default.giveTapVib()
         
         var periphItem: NEwPeripheralItem?
         if NEwBlueToolManager.default.favoHotPeriItemsList.count == 0 && NEwBlueToolManager.default.unotherPeriItemsList.count == 0 {

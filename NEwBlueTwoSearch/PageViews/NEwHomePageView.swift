@@ -2,7 +2,7 @@
 //  NEwHomePageView.swift
 //  NEwBlueTwoSearch
 //
-//  Created by Joe on 2023/6/4.
+//  Created by sege li on 2023/6/4.
 //
 
 import UIKit
@@ -13,6 +13,7 @@ class NEwHomePageView: UIView {
     let scanCenterBgV = NEwCenterScanView()
     let tiLabel = UILabel()
     let probtn = UIButton()
+    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,24 +31,49 @@ class NEwHomePageView: UIView {
     
     func showSearchingStatus(isShow: Bool) {
         
-        let offy = (self.frame.size.height / 2 - 70 - CGRectGetMaxY(tiLabel.frame)) / 2
-        let targetw: CGFloat = offy * 2 - 40
+        
+        var tarw: CGFloat = 0
+        var offy: CGFloat = 0
+        var targetw: CGFloat = 0
+        if UIScreen.isDevice8SEPaid() {
+            tarw = 150
+            let cey = CGRectGetMinY(scanCenterBgV.frame) + scanCenterBgV.bounds.size.height/2
+            let tary = CGRectGetMaxY(tiLabel.frame) + tarw/2
+            
+            offy = cey - tary
+            targetw = tarw - 20
+        } else {
+            tarw = 244
+            let cey = CGRectGetMinY(scanCenterBgV.frame) + scanCenterBgV.bounds.size.height/2
+            let tary = CGRectGetMaxY(tiLabel.frame) + tarw/2
+            
+            offy = cey - tary
+            targetw = tarw - 20
+        }
+        
+        
         let scalew: CGFloat = targetw / 311
         debugPrint("offy - \(offy)")
         
         scanCenterBgV.startAnimal(isStart: isShow)
         
-        
         UIView.animate(withDuration: 0.35, delay: 0) {
             
             if isShow {
                 self.scanCenterBgV.transform = CGAffineTransform(translationX: 0, y: -offy)
-                self.scanCenterBgV.transform = self.scanCenterBgV.transform.scaledBy(x: scalew, y: scalew)
+                
             } else {
                 self.scanCenterBgV.transform = CGAffineTransform.identity
             }
-            
         }
+        UIView.animate(withDuration: 0.35, delay: 0) {
+            if isShow {
+                self.scanCenterBgV.scaleBgV.transform = self.scanCenterBgV.scaleBgV.transform.scaledBy(x: scalew, y: scalew)
+            } else {
+                self.scanCenterBgV.scaleBgV.transform = CGAffineTransform.identity
+            }
+        }
+        
     }
     
     func setupV() {
@@ -61,7 +87,7 @@ class NEwHomePageView: UIView {
             .adhere(toSuperview: self) {
                 $0.left.equalToSuperview().offset(24)
 //                $0.centerY.equalTo(probtn.snp.centerY).offset(0)
-                $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(22)
+                $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(5)
                 $0.width.greaterThanOrEqualTo(10)
                 $0.height.equalTo(34)
             }
@@ -124,12 +150,14 @@ class NEwHomePageView: UIView {
     }
     
     @objc func probtnClick() {
+        NEwBlueToolManager.default.giveTapVib()
         if let fvc = fatherFuVC {
             NEwBlueToolManager.default.showOpenSubscribeProVC(fuVC: fvc)
         }
     }
     
     @objc func tapStartScanClick() {
+        NEwBlueToolManager.default.giveTapVib()
         startScanBlock?()
     }
 
@@ -141,11 +169,11 @@ extension NEwHomePageView {
 
 
 class NEwCenterScanView: UIView {
-
+    let scaleBgV = UIView()
     let layerV3 = UIImageView()
     let layerV2 = UIImageView()
     let layerV1 = UIImageView()
-    
+    let layerVcenter = UIImageView()
     private let radarAnimation = "radarAnimation"
     private let radarAnimation2 = "radarAnimatio2"
     private var animationLayer: CALayer?
@@ -210,25 +238,28 @@ class NEwCenterScanView: UIView {
     
     func setupV() {
         
+        scaleBgV.adhere(toSuperview: self) {
+            $0.left.top.bottom.right.equalToSuperview()
+        }
         layerV3
             .image("search_layer3")
             .contentMode(.scaleAspectFit)
-            .adhere(toSuperview: self) {
+            .adhere(toSuperview: scaleBgV) {
                 $0.left.top.bottom.right.equalToSuperview()
             }
         layerV2
             .image("search_layer2")
             .contentMode(.scaleAspectFit)
-            .adhere(toSuperview: self) {
+            .adhere(toSuperview: scaleBgV) {
                 $0.left.top.bottom.right.equalToSuperview()
             }
         layerV1
             .image("search_layer1")
             .contentMode(.scaleAspectFit)
-            .adhere(toSuperview: self) {
+            .adhere(toSuperview: scaleBgV) {
                 $0.left.top.bottom.right.equalToSuperview()
             }
-        let layerVcenter = UIImageView()
+        layerVcenter
             .image("searchIcon_center")
             .contentMode(.scaleAspectFit)
             .adhere(toSuperview: self) {

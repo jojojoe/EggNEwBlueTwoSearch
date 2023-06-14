@@ -2,7 +2,7 @@
 //  NEwBlueProManager.swift
 //  NEwBlueTwoSearch
 //
-//  Created by JOJO on 2023/6/9.
+//  Created by sege li on 2023/6/9.
 //
 
 import UIKit
