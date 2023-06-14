@@ -25,11 +25,9 @@ class NEwBlueToolManager: NSObject {
     //
     static let `default` = NEwBlueToolManager()
     var centralManager: CBCentralManager!
-    var peripheralItemList: [NEwPeripheralItem] = []
-    
+    var bluePeripheralList: [NEwPeripheralItem] = []
     var favoHotPeriItemsList: [NEwPeripheralItem] = []
     var unotherPeriItemsList: [NEwPeripheralItem] = []
-    
     var cachaedPeripheralItemList: [NEwPeripheralItem] = []
     let queue = DispatchQueue(label: "fetchqueue", qos: .background)
     var deviceBluetoothDeniedBlock: (()->Void)?
@@ -56,31 +54,10 @@ class NEwBlueToolManager: NSObject {
         fetchUserFavorites()
     }
     
-    func prepare() {
-        centralManager = CBCentralManager(delegate: self, queue: queue)
-    }
+}
+
+extension NEwBlueToolManager {
     
-    func startScan() {
-        DispatchQueue.global().async {
-            [weak self] in
-            guard let `self` = self else {return}
-            self.startRefreshYanchi = false
-            
-            self.centralManagerScan()
-        }
-    }
-    
-    func stopScan() {
-        cachaedPeripheralItemList = peripheralItemList
-        
-        centralManager.stopScan()
-        self.startRefreshYanchi = false
-    }
-    
-    func centralManagerScan() {
-       self.centralManager.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey : true])
-   }
-   
     func fetchUserFavorites() {
         hotBlueDevicesIdList = UserDefaults.standard.object(forKey: "nebud_favoriteHotBlueDevicesId") as? [String] ?? []
         debugPrint("favoriteDevicesIdList = \(hotBlueDevicesIdList.count)")
@@ -92,7 +69,7 @@ class NEwBlueToolManager: NSObject {
             UserDefaults.standard.set(hotBlueDevicesIdList, forKey: "nebud_favoriteHotBlueDevicesId")
             UserDefaults.standard.synchronize()
             
-            let peri = peripheralItemList.first { ite in
+            let peri = bluePeripheralList.first { ite in
                 ite.identifier == deviceId
             }
           
@@ -124,7 +101,7 @@ class NEwBlueToolManager: NSObject {
             UserDefaults.standard.set(hotBlueDevicesIdList, forKey: "nebud_favoriteHotBlueDevicesId")
             UserDefaults.standard.synchronize()
             
-            let peri = peripheralItemList.first { ite in
+            let peri = bluePeripheralList.first { ite in
                 ite.identifier == deviceId
             }
           
@@ -195,9 +172,38 @@ extension NEwBlueToolManager: MFMailComposeViewControllerDelegate {
 }
 
 extension NEwBlueToolManager {
+    
+    func prepare() {
+        centralManager = CBCentralManager(delegate: self, queue: queue)
+    }
+    
+    func startScan() {
+        DispatchQueue.global().async {
+            [weak self] in
+            guard let `self` = self else {return}
+            self.startRefreshYanchi = false
+            
+            self.centralManagerScan()
+        }
+    }
+    
+    func stopScan() {
+        cachaedPeripheralItemList = bluePeripheralList
+        
+        centralManager.stopScan()
+        self.startRefreshYanchi = false
+    }
+    
+    func centralManagerScan() {
+       self.centralManager.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey : true])
+   }
+   
+}
+
+extension NEwBlueToolManager {
     func audioSlowVoiceStyle() -> String {
         if let item = currentTrackingItem {
-            let persent = item.deviceDistancePercent()
+            let persent = item.blueDeviceDistancePercentDouble()
             if persent <= 0.7 {
                 return slowVoice
             } else {
@@ -237,10 +243,9 @@ extension NEwBlueToolManager {
         }
     }
     
-    //
     func playVibInterval() -> TimeInterval {
         if let item = currentTrackingItem {
-            let persent = item.deviceDistancePercent()
+            let persent = item.blueDeviceDistancePercentDouble()
             if persent <= 0.3 {
                 return 6
             } else if persent <= 0.7 {
@@ -257,7 +262,7 @@ extension NEwBlueToolManager {
         
         stopVibTimer()
         
-        func addnewTimer(interval: TimeInterval) {
+        func startaNewTimer(interval: TimeInterval) {
             let timer = Timer.new(every: interval) {
                 [weak self] in
                 guard let `self` = self else {return}
@@ -269,7 +274,7 @@ extension NEwBlueToolManager {
             timer.start()
         }
         
-        addnewTimer(interval: playVibInterval())
+        startaNewTimer(interval: playVibInterval())
         
     }
     
@@ -311,11 +316,11 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-//        DispatchQueue.global().async {
+
         Thread.sleep(forTimeInterval: 0.1)
             if let deviceName = peripheral.name {
                 
-                if let peItem = self.peripheralItemList.first(where: { perItem in
+                if let peItem = self.bluePeripheralList.first(where: { perItem in
                     let hasSameId = perItem.identifier == peripheral.identifier.uuidString
                     let hasSameName = perItem.deviceName == peripheral.name
                     return hasSameId || hasSameName
@@ -339,10 +344,10 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
                         }) {
                             peItem.rssi = Double(truncating: RSSI)
                             
-                            self.peripheralItemList.append(peItem)
+                            self.bluePeripheralList.append(peItem)
                         } else {
                             let item = NEwPeripheralItem(identifier: peripheral.identifier.uuidString, deviceName: deviceName, rssi: Double(truncating: RSSI))
-                            self.peripheralItemList.append(item)
+                            self.bluePeripheralList.append(item)
                         }
                     }
                     
@@ -365,20 +370,20 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
                     }
                 }
             }
-//        }
+
         
     }
     
     func sortPeripheraByRSSI() {
         
-        peripheralItemList.sort { perip1, perip2 in
+        bluePeripheralList.sort { perip1, perip2 in
             perip1.rssi > perip2.rssi
         }
         var favoriteList: [NEwPeripheralItem] = []
         var otherList: [NEwPeripheralItem] = []
         var hasPrepearList: [NEwPeripheralItem] = []
         var haspaixu: [String] = []
-        peripheralItemList.forEach {
+        bluePeripheralList.forEach {
 //            $0.updateRingProgress()
             if !haspaixu.contains($0.identifier) {
                 haspaixu.append($0.identifier)
@@ -423,41 +428,36 @@ class NEwPeripheralItem: Equatable {
         return lhs.identifier == rhs.identifier
     }
     
-    var identifier: String
     var deviceName: String
+    var identifier: String
     var rssi: Double
-//    var ringProgressView: RingProgressView = RingProgressView()
-    
-    func updateRingProgress() {
-        DispatchQueue.main.async {
-//            self.ringProgressView.progress = self.deviceDistancePercent()
-        }
-    }
+
     
     init(identifier: String, deviceName: String, rssi: Double) {
         self.identifier = identifier
         self.deviceName = deviceName
         self.rssi = rssi
-        //
-        DispatchQueue.main.async {
-//            self.ringProgressView.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
-//            self.ringProgressView.progress = self.deviceDistancePercent()
-//            self.ringProgressView.startColor = UIColor(hexString: "#3971FF")!
-//            self.ringProgressView.endColor = UIColor(hexString: "#3971FF")!
-//            self.ringProgressView.backgroundRingColor = .clear
-//            self.ringProgressView.ringWidth = 3
-//            self.ringProgressView.shadowOpacity = 0
-//            self.ringProgressView.hidesRingForZeroProgress = true
-        }
-        
-        
+       
+   
     }
     
-    func deviceDistancePercent() -> Double {
+    func calculateDistance(rssi: Int) -> Double {
+        let txPower =  -59
+        if (rssi == 0) {
+            return -1.0
+        }
+        let ratio = (Double(rssi) * 1.0) / Double(txPower)
+        if (ratio < 1.0) {
+            return pow(ratio, 10)
+        } else {
+            let disatance = (0.89976) * pow(ratio, 7.7095) + 0.111
+            return disatance
+        }
+    }
+    
+    func blueDeviceDistancePercentDouble() -> Double {
         var persValue: Double = 0
-        
         let distance = calculateDistance(rssi: Int(rssi))
-        
         if distance.isLessThanOrEqualTo(1.0) {
             persValue = 1
         }
@@ -477,65 +477,34 @@ class NEwPeripheralItem: Equatable {
             persValue = 0.55
         }
         if !distance.isLess(than: 5.0) && distance.isLess(than: 7.0) {
-            
             persValue = 0.50
         }
         if !distance.isLess(than: 7.0) && distance.isLess(than: 8.0) {
-            
             persValue = 0.40
         }
         if !distance.isLess(than: 8.0) && distance.isLess(than: 9.0) {
-            
             persValue = 0.30
         }
         if !distance.isLess(than: 9.0) && distance.isLess(than: 10.0) {
-            
             persValue = 0.20
         }
         if !distance.isLess(than: 10.0) && distance.isLess(than: 15.0) {
-            
             persValue = 0.15
         }
         if !distance.isLess(than: 15.0) && distance.isLess(than: 20.0) {
-            
             persValue = 0.10
         }
         if !distance.isLess(than: 20.0) && distance.isLess(than: 30.0) {
-            
             persValue = 0.05
         }
         if !distance.isLess(than: 30.0) {
-            
             persValue = 0.03
         }
         return persValue
     }
     
     func deviceDistancePercentStr() -> String {
-        return "\(Int(deviceDistancePercent() * 100))%"
-    }
-    
-    func deviceTagIconName(isBig: Bool = false) -> String {
-        var iconStr = "device_blue"
-        if deviceName.lowercased().contains("phone") {
-            iconStr = "device_phone"
-        } else if deviceName.lowercased().contains("book") {
-            iconStr = "device_macbook"
-        } else if deviceName.lowercased().contains("mac") {
-            iconStr = "device_taishiji"
-        } else if deviceName.lowercased().contains("pod") {
-            iconStr = "device_erji"
-        } else if deviceName.lowercased().contains("watch") {
-            iconStr = "device_watch"
-        } else if deviceName.lowercased().contains("pad") {
-            iconStr = "device_pad"
-        } else {
-            iconStr = "device_blue"
-        }
-        if isBig {
-            return iconStr + "_b"
-        }
-        return iconStr
+        return "\(Int(blueDeviceDistancePercentDouble() * 100))%"
     }
     
     func fetchAboutDistanceString() -> String {
@@ -571,20 +540,28 @@ class NEwPeripheralItem: Equatable {
         return string
     }
     
-    func calculateDistance(rssi: Int) -> Double {
-        let txPower =  -59
-        if (rssi == 0) {
-            return -1.0
-        }
-        let ratio = (Double(rssi) * 1.0) / Double(txPower)
-        if (ratio < 1.0) {
-            return pow(ratio, 10)
+    func deviceTagIconName(isBig: Bool = false) -> String {
+        var iconStr = "device_blue"
+        if deviceName.lowercased().contains("phone") {
+            iconStr = "device_phone"
+        } else if deviceName.lowercased().contains("book") {
+            iconStr = "device_macbook"
+        } else if deviceName.lowercased().contains("mac") {
+            iconStr = "device_taishiji"
+        } else if deviceName.lowercased().contains("pod") {
+            iconStr = "device_erji"
+        } else if deviceName.lowercased().contains("watch") {
+            iconStr = "device_watch"
+        } else if deviceName.lowercased().contains("pad") {
+            iconStr = "device_pad"
         } else {
-            let disatance = (0.89976) * pow(ratio, 7.7095) + 0.111
-            return disatance
+            iconStr = "device_blue"
         }
+        if isBig {
+            return iconStr + "_b"
+        }
+        return iconStr
     }
-    
 }
 
 

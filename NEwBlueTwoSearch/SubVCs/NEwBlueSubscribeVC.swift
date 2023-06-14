@@ -11,7 +11,6 @@ import WebKit
 
 class NEwBlueSubscribeVC: UIViewController {
   
-    
     var defaultWeekPrice: Double = 3.99
     var defaultMonthPrice: Double = 8.99
     var defaultYearPrice: Double = 29.99
@@ -359,7 +358,7 @@ extension NEwBlueSubscribeVC {
     }
     
     @objc func proContinueBtnClick() {
-        NEwBlueProManager.default.subscribeIapOrder(iapType: NEwBlueProManager.default.currentIapType, source: "shop") {[weak self] subSuccess, errorStr in
+        NEwBlueProManager.default.subscribeProvipOrder(iapType: NEwBlueProManager.default.currentIapType, source: "shop") {[weak self] subSuccess, errorStr in
             guard let `self` = self else {return}
             DispatchQueue.main.async {
                 if subSuccess {

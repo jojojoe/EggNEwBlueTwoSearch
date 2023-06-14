@@ -117,7 +117,7 @@ class NEwBlueDeviceContentVC: UIViewController {
                 self.refreshWating = false
             }
             //
-            let progress = peripheralItem.deviceDistancePercent()
+            let progress = peripheralItem.blueDeviceDistancePercentDouble()
             let percentStr = peripheralItem.deviceDistancePercentStr()
             ringProgressView.progress = progress
             persentLabel.text = percentStr
@@ -337,7 +337,7 @@ extension NEwBlueDeviceContentVC {
         ringProgressView.backgroundRingColor = .clear
         ringProgressView.hidesRingForZeroProgress = true
         ringProgressView.shadowOpacity = 0
-        ringProgressView.progress = peripheralItem.deviceDistancePercent()
+        ringProgressView.progress = peripheralItem.blueDeviceDistancePercentDouble()
         persentLabel.text = peripheralItem.deviceDistancePercentStr()
         
         

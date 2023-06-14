@@ -56,8 +56,89 @@ class NEwBlueProManager {
 }
 
 extension NEwBlueProManager {
-    // main method to check if purchased anything
-    func isPurchased(completion: @escaping (_ purchased: Bool) -> Void) {
+    
+    public func restore(_ successBlock: ((Bool) -> Void)? = nil) {
+        
+        SwiftyStoreKit.restorePurchases(atomically: true) { [weak self] results in
+            guard let `self` = self else { return }
+            if results.restoreFailedPurchases.count > 0 {
+                successBlock?(false)
+                debugPrint("Restore Failed: \(results.restoreFailedPurchases)")
+            } else if results.restoredPurchases.count > 0 {
+                for purchase in results.restoredPurchases {
+                    if purchase.needsFinishTransaction {
+                        SwiftyStoreKit.finishTransaction(purchase.transaction)
+                    }
+                }
+                
+                self.refreshReceipt { (_, _) in
+                    self.isPurchasedStatus { (status) in
+                        if status {
+                            NotificationCenter.default.post(
+                                name: NSNotification.Name(rawValue: PurchaseNotificationKeys.success),
+                                object: nil,
+                                userInfo: nil)
+                            debugPrint("Restore Success: \(results.restoredPurchases)")
+                            successBlock?(true)
+                        } else {
+                            successBlock?(false)
+                        }
+                    }
+                }
+            } else {
+                successBlock?(false)
+            }
+        }
+    }
+
+    public func subscribeProvipOrder(iapType: NEwBlueProManager.IAPType, source: String, completionBlock: ((Bool, String?) -> Void)? = nil) {
+        
+        SwiftyStoreKit.purchaseProduct(iapType.rawValue) { purchaseResult in
+            switch purchaseResult {
+            case let .success(purchaseDetail):
+                if purchaseDetail.needsFinishTransaction {
+                    SwiftyStoreKit.finishTransaction(purchaseDetail.transaction)
+                }
+                self.refreshReceipt { (_, _) in
+                    self.isPurchasedStatus { (status) in
+                        if status {
+                            let currency = purchaseDetail.product.priceLocale.currencySymbol ?? "$"
+                            let price = purchaseDetail.product.price.doubleValue
+                            debugPrint("product - \(currency)\(price)")
+                        }
+                        
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name(rawValue: PurchaseNotificationKeys.success),
+                            object: nil,
+                            userInfo: nil)
+                        completionBlock?(status, nil)
+                    }
+                }
+                
+            case let .error(error):
+                
+                var errorStr = error.localizedDescription
+                switch error.code {
+                case .unknown: errorStr = "Unknown error. Please contact support. If you are sure you have purchased it, please click the \"Restore\" button."
+                case .clientInvalid: errorStr = "Not allowed to make the payment"
+                case .paymentCancelled: errorStr = "Payment cancelled"
+                case .paymentInvalid: errorStr = "The purchase identifier was invalid"
+                case .paymentNotAllowed: errorStr = "The device is not allowed to make the payment"
+                case .storeProductNotAvailable: errorStr = "The product is not available in the current storefront"
+                case .cloudServicePermissionDenied: errorStr = "Access to cloud service information is not allowed"
+                case .cloudServiceNetworkConnectionFailed: errorStr = "Could not connect to the network"
+                case .cloudServiceRevoked: errorStr = "User has revoked permission to use this cloud service"
+                default: errorStr = (error as NSError).localizedDescription
+                }
+                completionBlock?(false, errorStr)
+                
+            }
+        }
+    }
+}
+
+extension NEwBlueProManager {
+    func isPurchasedStatus(completion: @escaping (_ purchased: Bool) -> Void) {
         let dispatchGroup = DispatchGroup()
         var validPurchases: [String: NwVerifyLocalSubscriptionResult] = [:]
         var errors: [String: Error] = [:]
@@ -110,6 +191,24 @@ extension NEwBlueProManager {
             completion(hasValid)
         }
     }
+}
+
+extension NEwBlueProManager {
+    public func fetchPurchaseInfo(block: @escaping (([NEwBlueProManager.IAPProduct]) -> Void)) {
+        let iapList = iapTypeList.map { $0.rawValue }
+
+        SwiftyStoreKit.retrieveProductsInfo(Set(iapList)) { result in
+            let priceList = result.retrievedProducts.compactMap { $0 }
+            let localList = priceList.compactMap { NEwBlueProManager.IAPProduct(iapID: $0.productIdentifier, price: $0.price.doubleValue.rounded(digits: 2), priceLocale: $0.priceLocale, localizedPrice: $0.localizedPrice, currencyCode: $0.priceLocale.currencyCode)
+            }
+            self.currentProducts = localList
+            block(localList)
+        }
+        
+    }
+}
+
+extension NEwBlueProManager {
     
     func verifyPurchase(_ purchase: IAPType,
                         completion: @escaping(NwVerifyLocalSubscriptionResult?, Error?) -> Void) {
@@ -199,100 +298,5 @@ extension NEwBlueProManager {
                 completion(nil, error)
             }
         })
-    }
-}
-
-extension NEwBlueProManager {
-    
-    public func fetchPurchaseInfo(block: @escaping (([NEwBlueProManager.IAPProduct]) -> Void)) {
-        let iapList = iapTypeList.map { $0.rawValue }
-
-        SwiftyStoreKit.retrieveProductsInfo(Set(iapList)) { result in
-            let priceList = result.retrievedProducts.compactMap { $0 }
-            let localList = priceList.compactMap { NEwBlueProManager.IAPProduct(iapID: $0.productIdentifier, price: $0.price.doubleValue.rounded(digits: 2), priceLocale: $0.priceLocale, localizedPrice: $0.localizedPrice, currencyCode: $0.priceLocale.currencyCode)
-            }
-            self.currentProducts = localList
-            block(localList)
-        }
-        
-    }
-
-    public func restore(_ successBlock: ((Bool) -> Void)? = nil) {
-        
-        SwiftyStoreKit.restorePurchases(atomically: true) { [weak self] results in
-            guard let `self` = self else { return }
-            if results.restoreFailedPurchases.count > 0 {
-                successBlock?(false)
-                debugPrint("Restore Failed: \(results.restoreFailedPurchases)")
-            } else if results.restoredPurchases.count > 0 {
-                for purchase in results.restoredPurchases {
-                    if purchase.needsFinishTransaction {
-                        SwiftyStoreKit.finishTransaction(purchase.transaction)
-                    }
-                }
-                
-                self.refreshReceipt { (_, _) in
-                    self.isPurchased { (status) in
-                        if status {
-                            NotificationCenter.default.post(
-                                name: NSNotification.Name(rawValue: PurchaseNotificationKeys.success),
-                                object: nil,
-                                userInfo: nil)
-                            debugPrint("Restore Success: \(results.restoredPurchases)")
-                            successBlock?(true)
-                        } else {
-                            successBlock?(false)
-                        }
-                    }
-                }
-            } else {
-                successBlock?(false)
-            }
-        }
-    }
-
-    public func subscribeIapOrder(iapType: NEwBlueProManager.IAPType, source: String, completionBlock: ((Bool, String?) -> Void)? = nil) {
-        
-        SwiftyStoreKit.purchaseProduct(iapType.rawValue) { purchaseResult in
-            switch purchaseResult {
-            case let .success(purchaseDetail):
-                if purchaseDetail.needsFinishTransaction {
-                    SwiftyStoreKit.finishTransaction(purchaseDetail.transaction)
-                }
-                self.refreshReceipt { (_, _) in
-                    self.isPurchased { (status) in
-                        if status {
-                            let currency = purchaseDetail.product.priceLocale.currencySymbol ?? "$"
-                            let price = purchaseDetail.product.price.doubleValue
-                            debugPrint("product - \(currency)\(price)")
-                        }
-                        
-                        NotificationCenter.default.post(
-                            name: NSNotification.Name(rawValue: PurchaseNotificationKeys.success),
-                            object: nil,
-                            userInfo: nil)
-                        completionBlock?(status, nil)
-                    }
-                }
-                
-            case let .error(error):
-                
-                var errorStr = error.localizedDescription
-                switch error.code {
-                case .unknown: errorStr = "Unknown error. Please contact support. If you are sure you have purchased it, please click the \"Restore\" button."
-                case .clientInvalid: errorStr = "Not allowed to make the payment"
-                case .paymentCancelled: errorStr = "Payment cancelled"
-                case .paymentInvalid: errorStr = "The purchase identifier was invalid"
-                case .paymentNotAllowed: errorStr = "The device is not allowed to make the payment"
-                case .storeProductNotAvailable: errorStr = "The product is not available in the current storefront"
-                case .cloudServicePermissionDenied: errorStr = "Access to cloud service information is not allowed"
-                case .cloudServiceNetworkConnectionFailed: errorStr = "Could not connect to the network"
-                case .cloudServiceRevoked: errorStr = "User has revoked permission to use this cloud service"
-                default: errorStr = (error as NSError).localizedDescription
-                }
-                completionBlock?(false, errorStr)
-                
-            }
-        }
     }
 }

@@ -70,14 +70,14 @@ class NEwSearchingBottomView: UIView {
     
     @objc func discoverDeviceUpdate(notification: Notification) {
         DispatchQueue.main.async {
-            if NEwBlueToolManager.default.peripheralItemList.count == 0 {
+            if NEwBlueToolManager.default.bluePeripheralList.count == 0 {
                 self.noDeviceBgV.isHidden = false
             } else {
                 self.noDeviceBgV.isHidden = true
             }
             self.collection.reloadData()
             self.deviceContentBtn
-                .title("\(NEwBlueToolManager.default.peripheralItemList.count) nearby devices found")
+                .title("\(NEwBlueToolManager.default.bluePeripheralList.count) nearby devices found")
         }
     }
     
@@ -150,7 +150,7 @@ class NEwSearchingBottomView: UIView {
             $0.height.equalTo(50)
             $0.top.equalTo(collection.snp.bottom).offset(0)
         }
-        .title("\(NEwBlueToolManager.default.peripheralItemList.count) nearby devices found")
+        .title("\(NEwBlueToolManager.default.bluePeripheralList.count) nearby devices found")
         .titleColor(UIColor(hexString: "#3971FF")!)
         .font(UIFont.SFProTextSemibold, 14)
         .target(target: self, action: #selector(deviceContentBtnClick), event: .touchUpInside)
@@ -230,7 +230,7 @@ extension NEwSearchingBottomView {
 extension NEwSearchingBottomView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withClass: NEwSearchingItemCell.self, for: indexPath)
-        let preitem = NEwBlueToolManager.default.peripheralItemList[indexPath.item]
+        let preitem = NEwBlueToolManager.default.bluePeripheralList[indexPath.item]
         cell.updateItemContentStatus(peripheralItem: preitem)
         var rinigV = ringProgressViewList[preitem.identifier]
         if rinigV == nil {
@@ -239,13 +239,13 @@ extension NEwSearchingBottomView: UICollectionViewDataSource {
         }
         cell.iconbgV.removeSubviews()
         cell.iconbgV.addSubview(rinigV!)
-        rinigV!.progress = preitem.deviceDistancePercent()
+        rinigV!.progress = preitem.blueDeviceDistancePercentDouble()
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return NEwBlueToolManager.default.peripheralItemList.count
+        return NEwBlueToolManager.default.bluePeripheralList.count
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -276,7 +276,7 @@ extension NEwSearchingBottomView: UICollectionViewDelegateFlowLayout {
 
 extension NEwSearchingBottomView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let preitem = NEwBlueToolManager.default.peripheralItemList[indexPath.item]
+        let preitem = NEwBlueToolManager.default.bluePeripheralList[indexPath.item]
         itemclickBlock?(preitem)
     }
     

@@ -181,7 +181,7 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
             }
             cell.iconbgV.removeSubviews()
             cell.iconbgV.addSubview(rinigV!)
-            rinigV!.progress = preitem.deviceDistancePercent()
+            rinigV!.progress = preitem.blueDeviceDistancePercentDouble()
             
         }
         
@@ -624,7 +624,7 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         self.peripheralItem = peripheralItem
         let deviceNameStr = peripheralItem.deviceName
         let deviceIconStr = peripheralItem.deviceTagIconName(isBig: false)
-        let distancePercent = peripheralItem.deviceDistancePercent()
+        let distancePercent = peripheralItem.blueDeviceDistancePercentDouble()
         let distanceAboutM = peripheralItem.fetchAboutDistanceString()
         let distanceAproxStr = "Approx. \(distanceAboutM) away from you"
         //

@@ -23,14 +23,9 @@ class ViewController: UIViewController {
         //
         setView1()
         bluetoothBtnClick()
-        //
-//        let vc = NEwBlueSplGuideVC()
-//        self.navigationController?.pushViewController(vc, animated: true)
 
     }
     
-    
-
     func setView1() {
         view.clipsToBounds()
             .backgroundColor(.white)
@@ -153,7 +148,6 @@ extension ViewController {
                 self.searchingBottomPage?.removeFromSuperview()
             }
         }
-        
     }
     
     func showBlueDeniedV() {
@@ -203,7 +197,7 @@ extension ViewController {
     
     func scanBtnClickAction() {
         if NEwBlueToolManager.default.centralManagerStatus == true {
-            NEwBlueToolManager.default.peripheralItemList = []
+            NEwBlueToolManager.default.bluePeripheralList = []
             NEwBlueToolManager.default.startScan()
             showSearchingBlueStatus()
         } else {
