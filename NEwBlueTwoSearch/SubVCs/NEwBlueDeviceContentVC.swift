@@ -27,6 +27,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     
 //    let testinfoLabel = UILabel()
     var refreshWating: Bool = false
+    var refreshDetailInfoStrCount: Int = 0
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .darkContent
@@ -48,6 +49,7 @@ class NEwBlueDeviceContentVC: UIViewController {
         setupV()
         
         updateFavoriteStatus()
+        updatePositionPersent()
         
         if !NEwBlueToolManager.default.centralManager.isScanning {
             NEwBlueToolManager.default.startScan()
@@ -122,9 +124,23 @@ class NEwBlueDeviceContentVC: UIViewController {
             ringProgressView.progress = progress
             persentLabel.text = percentStr
             
+            
             let distanceAboutM = peripheralItem.fetchAboutDistanceString()
             let distanceAproxStr = "Approx. \(distanceAboutM) away from you"
             infoDescribeLabel.text(distanceAproxStr)
+            
+            
+            if refreshDetailInfoStrCount >= 0 && refreshDetailInfoStrCount < 10 {
+                infoDescribeLabel.text("Move around so that the signal\nstrength increases")
+                refreshDetailInfoStrCount += 1
+            } else if refreshDetailInfoStrCount >= 10 && refreshDetailInfoStrCount < 20 {
+                refreshDetailInfoStrCount += 1
+            } else if refreshDetailInfoStrCount >= 20 {
+                refreshDetailInfoStrCount = 0
+            } else {
+                refreshDetailInfoStrCount += 1
+            }
+            
             checkVoiceVibStatus()
             
         }
@@ -213,7 +229,7 @@ extension NEwBlueDeviceContentVC {
         foundBtn.adhere(toSuperview: view) {
             $0.centerX.equalToSuperview()
             if UIScreen.isDevice8SE() {
-                $0.bottom.equalToSuperview().offset(-15)
+                $0.bottom.equalToSuperview().offset(-20)
             } else {
                 $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-30)
             }
@@ -238,7 +254,7 @@ extension NEwBlueDeviceContentVC {
             $0.width.equalTo(80)
             $0.height.equalTo(109)
             if UIScreen.isDevice8SE() {
-                $0.bottom.equalTo(foundBtn.snp.top).offset(-10)
+                $0.bottom.equalTo(foundBtn.snp.top).offset(-20)
             } else {
                 $0.bottom.equalTo(foundBtn.snp.top).offset(-40)
             }

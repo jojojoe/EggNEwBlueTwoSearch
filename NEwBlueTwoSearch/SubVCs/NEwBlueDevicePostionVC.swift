@@ -89,15 +89,15 @@ class NEwBlueDevicePostionVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.setupLocationPositionNow()
+//        self.setupLocationPositionNow()
     }
-    
-    func setupLocationPositionNow() {
-        
-        
-        
-    }
-    
+//
+//    func setupLocationPositionNow() {
+//
+//
+//
+//    }
+//
     func setupV() {
         view.clipsToBounds = true
         //
@@ -167,8 +167,9 @@ class NEwBlueDevicePostionVC: UIViewController {
         infoDevNameLabel
             .adhere(toSuperview: bottomBar) {
                 $0.left.equalToSuperview().offset(30)
+                $0.right.equalToSuperview().offset(-20)
                 $0.top.equalTo(bottomBarCloseBtn.snp.bottom).offset(0)
-                $0.width.height.greaterThanOrEqualTo(20)
+                $0.height.equalTo(26)
             }
             .lineBreakMode(.byTruncatingTail)
             .text(bluetoothDevice.deviceName)

@@ -23,6 +23,15 @@ class NEwBlueDeviceListVC: UIViewController {
         super.viewDidLoad()
         setupContentV()
         addNoti()
+        
+//#if DEBUG
+//let item1 = NEwPeripheralItem(identifier: "1", deviceName: "mac", rssi: -59)
+//let item2 = NEwPeripheralItem(identifier: "2", deviceName: "phone", rssi: -59)
+//let item3 = NEwPeripheralItem(identifier: "3", deviceName: "pods", rssi: -59)
+//NEwBlueToolManager.default.favoHotPeriItemsList = [item1, item2, item3]
+//NEwBlueToolManager.default.sendTrackingDeviceNotification()
+//
+//#endif
     }
     
     required init?(coder: NSCoder) {
@@ -181,8 +190,8 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
                 rinigV = setupRingProgressV()
                 ringProgressViewList[preitem.identifier] = rinigV
             }
-            cell.iconbgV.removeSubviews()
-            cell.iconbgV.addSubview(rinigV!)
+            cell.ringBgV.removeSubviews()
+            cell.ringBgV.addSubview(rinigV!)
             rinigV!.progress = preitem.blueDeviceDistancePercentDouble()
             
         }
@@ -502,7 +511,7 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
     var favoClickBlock: ((Bool, String)->Void)?
     
     var peripheralItem: NEwPeripheralItem?
-     
+     let ringBgV = UIView()
     let deviceIconImgV = UIImageView()
     let deviceNameLabel = UILabel()
     let destanceLabel = UILabel()
@@ -527,10 +536,6 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         }
         //
         contentBgV.addSubview(deviceIconImgV)
-        deviceIconImgV.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
-        }
-        
         //
         contentBgV.addSubview(iconbgV)
         iconbgV.backgroundColor = UIColor(hexString: "#E8EDFF")
@@ -547,8 +552,16 @@ class NEwDeviceListCell: NEwSwipeCollectionCell {
         contentBgV.addSubview(deviceIconImgV)
         deviceIconImgV.snp.makeConstraints {
             $0.center.equalTo(iconbgV)
-            $0.width.height.equalTo(30)
+            $0.width.height.equalTo(48)
         }
+        //
+        
+        ringBgV
+            .adhere(toSuperview: contentBgV) {
+                $0.left.right.top.bottom.equalTo(iconbgV)
+            }
+            .backgroundColor(.clear)
+        ringBgV.isUserInteractionEnabled = false
         //
         contentBgV.addSubview(deviceNameLabel)
         deviceNameLabel.font = UIFont(name: UIFont.SFProTextBold, size: 16)

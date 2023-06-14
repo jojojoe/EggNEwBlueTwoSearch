@@ -24,55 +24,6 @@ class NEwBlueSubscribeVC: UIViewController {
     var didlayoutOnce = Once()
     
     
-//    let scaningAniBgV = UIView()
-//    let centerScanAniImgV = UIImageView()
-    
-//    let backBtn = UIButton()
-//    let theContinueBtn = UIButton()
-//    let monthBgBtn = UIButton()
-//    let yearBgBtn = UIButton()
-    
-//    let yearPriceLabel = UILabel()
-//    let yearPriceInfoLabel = UILabel()
-//    let yearSelectImgV = UIImageView()
-    
-//    let monthPriceLabel = UILabel()
-//    let monthPriceInfoLabel = UILabel()
-//    let monthSelectImgV = UIImageView()
-    
-//    var pageDisappearBlock: (()->Void)?
-    
-    
-    
-//    private let radarAnimation = "radarAnimation"
-//    private var animationLayer: CALayer?
-//    private var animationGroup: CAAnimationGroup?
-    
-
-    
-//    func startScanRotateAnimal() {
-//        makeRadarAnimation(animalView: centerScanAniImgV)
-//
-//    }
-    
-//    func stopScanRotateAnimal() {
-//        centerScanAniImgV.layer.removeAnimation(forKey: radarAnimation)
-//    }
-    
-//    private func makeRadarAnimation(animalView: UIView) {
-//
-//        let animation = CABasicAnimation(keyPath: "transform.rotation.z")
-//        animation.fromValue = 0.0
-//        animation.toValue = CGFloat.pi * 2
-//        animation.duration  = 2
-//        animation.autoreverses = false
-//        animation.fillMode = .forwards
-//        animation.repeatCount = HUGE
-//
-//        animalView.layer.add(animation, forKey: radarAnimation)
-//
-//    }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()

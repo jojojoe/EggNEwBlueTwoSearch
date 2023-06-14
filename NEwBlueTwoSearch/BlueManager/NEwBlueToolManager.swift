@@ -21,7 +21,7 @@ class NEwBlueToolManager: NSObject {
     let privacyStr = "https://sites.google.com/view/findheadphone-privacypolicy/home"
     
     var isSplashBegin: Bool = false
-    let feedvImpact = UIImpactFeedbackGenerator.init(style: .light)
+    let feedvImpact = UIImpactFeedbackGenerator.init(style: .medium)
     //
     static let `default` = NEwBlueToolManager()
     var centralManager: CBCentralManager!
@@ -55,7 +55,8 @@ class NEwBlueToolManager: NSObject {
     }
     
     func giveTapVib() {
-        feedvImpact.impactOccurred()
+//        UIImpactFeedbackGenerator.init(style: .medium).impactOccurred(intensity: 1)
+        feedvImpact.impactOccurred(intensity: 1)
     }
 }
 

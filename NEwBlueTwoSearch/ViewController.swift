@@ -17,7 +17,7 @@ class ViewController: UIViewController {
     let homePage = NEwHomePageView()
     let settingPage = NEwSettingPageView()
     let manualPage = NEwManualPageView()
-    
+    var isfirstOp = true
     override func viewDidLoad() {
         super.viewDidLoad()
         //
@@ -220,16 +220,16 @@ extension ViewController {
 //            showBlueDeniedV()
             
             //Test
-            #if DEBUG
-            let item1 = NEwPeripheralItem(identifier: "1", deviceName: "mac", rssi: -59)
-            let item2 = NEwPeripheralItem(identifier: "2", deviceName: "phone", rssi: -59)
-            let item3 = NEwPeripheralItem(identifier: "3", deviceName: "pods", rssi: -59)
-            NEwBlueToolManager.default.bluePeripheralList = [item1, item2, item3]
-            showSearchingBlueStatus()
-            
-            NEwBlueToolManager.default.sendTrackingDeviceNotification()
-            
-            #endif
+//            #if DEBUG
+//            let item1 = NEwPeripheralItem(identifier: "1", deviceName: "mac", rssi: -59)
+//            let item2 = NEwPeripheralItem(identifier: "2", deviceName: "phone", rssi: -59)
+//            let item3 = NEwPeripheralItem(identifier: "3", deviceName: "pods", rssi: -59)
+//            NEwBlueToolManager.default.bluePeripheralList = [item1, item2, item3]
+//            showSearchingBlueStatus()
+//
+//            NEwBlueToolManager.default.sendTrackingDeviceNotification()
+//
+//            #endif
             
             
             
@@ -237,7 +237,12 @@ extension ViewController {
     }
     
     @objc func bluetoothBtnClick() {
-        NEwBlueToolManager.default.giveTapVib()
+        if isfirstOp {
+            isfirstOp = false
+        } else {
+            NEwBlueToolManager.default.giveTapVib()
+        }
+        
         homePage.isHidden = false
         manualPage.isHidden = true
         settingPage.isHidden = true
