@@ -203,18 +203,18 @@ extension NEwBlueDeviceListVC: UICollectionViewDataSource {
             DispatchQueue.main.async {
                 NEwBlueToolManager.default.giveTapVib()
                 if deviceid.count >= 1 {
-                    if favoStatus {
-                        NEwBlueToolManager.default.appendUserFavoriteBlueDevice(deviceId: deviceid)
-                    } else {
-                        NEwBlueToolManager.default.removeUserFavorite(deviceId: deviceid)
-                    }
+                    
                     cell.contentView.alpha = 1
                     cell.backgroundColor = .white
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.15) {
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
                         [weak self] in
                         guard let `self` = self else {return}
-
-                        self.collection.reloadData()
+                        if favoStatus {
+                            NEwBlueToolManager.default.appendUserFavoriteBlueDevice(deviceId: deviceid)
+                        } else {
+                            NEwBlueToolManager.default.removeUserFavorite(deviceId: deviceid)
+                        }
+//                        self.collection.reloadData()
                     }
                     
                 }

@@ -36,14 +36,12 @@
 		D8E76A1D2A2CD36E008BD289 /* NEwSearchingBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1C2A2CD36E008BD289 /* NEwSearchingBottomView.swift */; };
 		D8E76A202A2E2FF0008BD289 /* MKNRingProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A1F2A2E2FF0008BD289 /* MKNRingProgressView.swift */; };
 		D8E76A232A2F70C3008BD289 /* NEwSwipeCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A222A2F70C3008BD289 /* NEwSwipeCollectionCell.swift */; };
-		D8E76A252A321B1E008BD289 /* NEwBlueSubscribeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */; };
 		D8E76A272A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A262A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift */; };
 		D8E76A2A2A345721008BD289 /* nb_did_fast.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D8E76A282A345721008BD289 /* nb_did_fast.m4a */; };
 		D8E76A2B2A345721008BD289 /* nb_did_slow.m4a in Resources */ = {isa = PBXBuildFile; fileRef = D8E76A292A345721008BD289 /* nb_did_slow.m4a */; };
 		D8E76A2D2A3579A7008BD289 /* NEwSplashPageOne.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A2C2A3579A7008BD289 /* NEwSplashPageOne.swift */; };
 		D8E76A2F2A3579B2008BD289 /* NEwSplashPageTwo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A2E2A3579B2008BD289 /* NEwSplashPageTwo.swift */; };
 		D8E76A312A3579BC008BD289 /* NEwSplashPageThree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A302A3579BC008BD289 /* NEwSplashPageThree.swift */; };
-		EB9B88742A333471007208D4 /* NEwBlueProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88732A333471007208D4 /* NEwBlueProManager.swift */; };
 		EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */; };
 		EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */; };
 		EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */; };
@@ -412,8 +410,6 @@
 				D8E769FD2A2C6E94008BD289 /* Device.generated.swift in Sources */,
 				D8E76A2F2A3579B2008BD289 /* NEwSplashPageTwo.swift in Sources */,
 				D8E76A272A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift in Sources */,
-				EB9B88742A333471007208D4 /* NEwBlueProManager.swift in Sources */,
-				D8E76A252A321B1E008BD289 /* NEwBlueSubscribeVC.swift in Sources */,
 				D8E769F42A2C6D2F008BD289 /* KRHudExtensions.swift in Sources */,
 				D8E769DC2A2C6ADA008BD289 /* ViewController.swift in Sources */,
 				EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */,
@@ -575,17 +571,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 53ADUL6525;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Find Headphone requires access to your device's bluetooth services to help you find your devices.";
+				INFOPLIST_KEY_CFBundleDisplayName = "Device Finder";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Device Finder requires access to your device's bluetooth services.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Device Finder requires access to your device's bluetooth services to help you find your devices.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "App needs your camera permission to scan documents to generate PDF files to print.";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Find Headphone will use your location to help you find your devices on a map";
-				INFOPLIST_KEY_NSLocationUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Find Headphone will use your location to help you find your devices on a map";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Device Finder will use your location to help you find your devices on a map";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Device Finder requires access to your device's bluetooth services.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Device Finder will use your location to help you find your devices on a map";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -599,8 +597,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.superegg.okeydokey;
+				PRODUCT_BUNDLE_IDENTIFIER = com.find.spy.device;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -616,17 +615,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 53ADUL6525;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Find Headphone requires access to your device's bluetooth services to help you find your devices.";
+				INFOPLIST_KEY_CFBundleDisplayName = "Device Finder";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Device Finder requires access to your device's bluetooth services.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Device Finder requires access to your device's bluetooth services to help you find your devices.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "App needs your camera permission to scan documents to generate PDF files to print.";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Find Headphone will use your location to help you find your devices on a map";
-				INFOPLIST_KEY_NSLocationUsageDescription = "Find Headphone requires access to your device's bluetooth services.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Find Headphone will use your location to help you find your devices on a map";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Device Finder will use your location to help you find your devices on a map";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Device Finder requires access to your device's bluetooth services.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Device Finder will use your location to help you find your devices on a map";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -640,8 +641,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.superegg.okeydokey;
+				PRODUCT_BUNDLE_IDENTIFIER = com.find.spy.device;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

@@ -353,11 +353,7 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        /*
-            trueHeading     : 真北方向
-            magneticHeading : 磁北方向
-         */
-        /// 获得当前设备
+        
         let device = UIDevice.current
         
         // 1.判断当前磁力计的角度是否有效(如果此值小于0,代表角度无效)越小越精确
@@ -372,7 +368,7 @@ extension NEwBlueDevicePostionVC: CLLocationManagerDelegate {
             /// 地磁北方向
             let headi: Float = -1.0 * Float.pi * Float(newHeading.magneticHeading) / 180.0
             // 设置角度label文字
-            debugPrint("偏转角度\(Int(magneticHeading))")
+            debugPrint("rato\(Int(magneticHeading))")
             
             // 4.
             update(newHeading)

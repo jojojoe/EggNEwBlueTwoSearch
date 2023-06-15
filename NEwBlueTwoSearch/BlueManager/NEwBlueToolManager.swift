@@ -15,10 +15,10 @@ import MessageUI
 class NEwBlueToolManager: NSObject {
     //
     
-    let shareUrl: String = "itms-apps://itunes.apple.com/cn/app/id\("6447954851")?mt=8"
-    let feedbackStr: String = "lwang0928@gmail.com"
-    let termsStr = "https://sites.google.com/view/findheadphone-termsofuse/home"
-    let privacyStr = "https://sites.google.com/view/findheadphone-privacypolicy/home"
+    let shareUrl: String = "itms-apps://itunes.apple.com/cn/app/id\("6450285725")?mt=8"
+    let feedbackStr: String = "dham_huang_dad390@outlook.com"
+    let termsStr = "https://sites.google.com/view/device-finder-pp/home"
+    let privacyStr = "https://sites.google.com/view/devicefinder-tou/home"
     
     var isSplashBegin: Bool = false
     let feedvImpact = UIImpactFeedbackGenerator.init(style: .medium)
@@ -412,8 +412,10 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
 
 extension NEwBlueToolManager {
     func showOpenSubscribeProVC(fuVC: UIViewController) {
+        /* sub
         let vc = NEwBlueSubscribeVC()
         fuVC.navigationController?.pushViewController(vc, animated: true)
+         */
     }
 }
 

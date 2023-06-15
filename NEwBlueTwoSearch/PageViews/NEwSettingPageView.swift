@@ -45,7 +45,7 @@ class NEwSettingPageView: UIView {
             .color(.white)
             .font(UIFont.SFProTextHeavy, 20)
             .adhere(toSuperview: self) {
-                $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(20)
+                $0.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(5)
                 $0.left.equalToSuperview().offset(24)
                 $0.width.greaterThanOrEqualTo(10)
                 $0.height.equalTo(34)
@@ -162,9 +162,11 @@ extension NEwSettingPageView {
     @objc func wangguanBtnClick() {
         NEwBlueToolManager.default.giveTapVib()
         if let vc = self.fatherFuVC {
+            /* sub
             let subscribe = NEwBlueSubscribeVC()
             subscribe.modalPresentationStyle = .fullScreen
             vc.present(subscribe, animated: true)
+             */
         }
     }
     
@@ -194,6 +196,7 @@ extension NEwSettingPageView {
     
     @objc func restoreBtnClick() {
         NEwBlueToolManager.default.giveTapVib()
+        /* sub
         if NEwBlueProManager.default.inSubscription {
             KRProgressHUD.showSuccess(withMessage: "You are already in the subscription period!")
         } else {
@@ -205,6 +208,7 @@ extension NEwSettingPageView {
                 }
             }
         }
+         */
     }
 }
 

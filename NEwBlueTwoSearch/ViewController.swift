@@ -217,7 +217,7 @@ extension ViewController {
             NEwBlueToolManager.default.startScan()
             showSearchingBlueStatus()
         } else {
-//            showBlueDeniedV()
+            showBlueDeniedV()
             
             //Test
 //            #if DEBUG
