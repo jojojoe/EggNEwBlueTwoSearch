@@ -178,7 +178,7 @@ extension NEwBlueToolManager: MFMailComposeViewControllerDelegate {
 extension NEwBlueToolManager {
     
     func prepare() {
-        centralManager = CBCentralManager(delegate: self, queue: queue)
+        centralManager = CBCentralManager(delegate: self, queue: queue, options: [CBCentralManagerOptionShowPowerAlertKey : false])
     }
     
     func startScan() {

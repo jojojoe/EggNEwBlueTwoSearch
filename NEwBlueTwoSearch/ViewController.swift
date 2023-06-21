@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     var isfirstOp = true
     override func viewDidLoad() {
         super.viewDidLoad()
+        NEwBlueToolManager.default.prepare()
         //
         setView1()
         bluetoothBtnClick()
