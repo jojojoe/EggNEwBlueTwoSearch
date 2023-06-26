@@ -46,6 +46,8 @@
 		EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */; };
 		EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */; };
 		EB9E45412A2F251F0068AACB /* NEwBlueDevicePostionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */; };
+		EBD109032A499475003BF270 /* NEwBlueProManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88732A333471007208D4 /* NEwBlueProManager.swift */; };
+		EBD109042A499581003BF270 /* NEwBlueSubscribeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A242A321B1E008BD289 /* NEwBlueSubscribeVC.swift */; };
 		EBF49E9907D95F9FA6DBC275 /* Pods_NEwBlueTwoSearch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B9AA163C554EB5C9F9E40EE /* Pods_NEwBlueTwoSearch.framework */; };
 /* End PBXBuildFile section */
 
@@ -410,6 +412,7 @@
 				D8E769FD2A2C6E94008BD289 /* Device.generated.swift in Sources */,
 				D8E76A2F2A3579B2008BD289 /* NEwSplashPageTwo.swift in Sources */,
 				D8E76A272A3427C1008BD289 /* NEwBlueMapSanjiaoView.swift in Sources */,
+				EBD109042A499581003BF270 /* NEwBlueSubscribeVC.swift in Sources */,
 				D8E769F42A2C6D2F008BD289 /* KRHudExtensions.swift in Sources */,
 				D8E769DC2A2C6ADA008BD289 /* ViewController.swift in Sources */,
 				EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */,
@@ -423,6 +426,7 @@
 				D8E76A122A2C8F59008BD289 /* NEwBlueToolManager.swift in Sources */,
 				D8E76A312A3579BC008BD289 /* NEwSplashPageThree.swift in Sources */,
 				D8E769DA2A2C6ADA008BD289 /* SceneDelegate.swift in Sources */,
+				EBD109032A499475003BF270 /* NEwBlueProManager.swift in Sources */,
 				D8E769F52A2C6D2F008BD289 /* KRProgressHUDIconType.swift in Sources */,
 				EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */,
 				D8E769F92A2C6DED008BD289 /* KRActivityIndicatorView.swift in Sources */,

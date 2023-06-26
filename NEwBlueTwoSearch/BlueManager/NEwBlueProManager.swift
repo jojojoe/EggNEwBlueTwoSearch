@@ -72,7 +72,7 @@ extension NEwBlueProManager {
                 }
                 
                 self.refreshReceipt { (_, _) in
-                    self.isPurchasedStatus { (status) in
+                    self.isPurchasedSubscribeStatus { (status) in
                         if status {
                             NotificationCenter.default.post(
                                 name: NSNotification.Name(rawValue: PurchaseNotificationKeys.success),
@@ -100,7 +100,7 @@ extension NEwBlueProManager {
                     SwiftyStoreKit.finishTransaction(purchaseDetail.transaction)
                 }
                 self.refreshReceipt { (_, _) in
-                    self.isPurchasedStatus { (status) in
+                    self.isPurchasedSubscribeStatus { (status) in
                         if status {
                             let currency = purchaseDetail.product.priceLocale.currencySymbol ?? "$"
                             let price = purchaseDetail.product.price.doubleValue
@@ -138,7 +138,7 @@ extension NEwBlueProManager {
 }
 
 extension NEwBlueProManager {
-    func isPurchasedStatus(completion: @escaping (_ purchased: Bool) -> Void) {
+    func isPurchasedSubscribeStatus(completion: @escaping (_ purchased: Bool) -> Void) {
         let dispatchGroup = DispatchGroup()
         var validPurchases: [String: NwVerifyLocalSubscriptionResult] = [:]
         var errors: [String: Error] = [:]

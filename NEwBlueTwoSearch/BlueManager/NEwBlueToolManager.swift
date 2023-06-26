@@ -20,7 +20,7 @@ class NEwBlueToolManager: NSObject {
     let termsStr = "https://sites.google.com/view/device-finder-pp/home"
     let privacyStr = "https://sites.google.com/view/devicefinder-tou/home"
     
-    var isSplashBegin: Bool = false
+//    var isSplashBegin: Bool = false
     let feedvImpact = UIImpactFeedbackGenerator.init(style: .medium)
     //
     static let `default` = NEwBlueToolManager()
