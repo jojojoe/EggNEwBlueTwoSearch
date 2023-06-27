@@ -22,20 +22,18 @@ class NEwBlueSubscribeVC: UIViewController {
     let weekProBtn = NEwStoreBtn(frame: .zero, productType: .week)
     let yearProBtn = NEwStoreBtn(frame: .zero, productType: .year)
     var didlayoutOnce = Once()
-    
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        setupV()
-        
-    }
+    var pageDisappearBlock: (()->Void)?
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .darkContent
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupV()
+    }
+    
+   
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if topbannerV.bounds.size.width == UIScreen.main.bounds.size.width {
@@ -43,16 +41,14 @@ class NEwBlueSubscribeVC: UIViewController {
                 self.addScaningAnimalV()
             }
         }
-
     }
-    
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         scanCenterBgV.startAnimal(isStart: false)
-
+        pageDisappearBlock?()
     }
-    
+   
     func setupV() {
         view.clipsToBounds = true
         //
