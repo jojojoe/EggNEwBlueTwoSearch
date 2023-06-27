@@ -11,10 +11,7 @@ import WebKit
 
 class NEwBlueSubscribeVC: UIViewController {
   
-    var defaultWeekPrice: Double = 3.99
-    var defaultMonthPrice: Double = 8.99
-    var defaultYearPrice: Double = 29.99
-    var currentSymbol: String = "$"
+    
     
     let topbannerV = UIView()
     let scanCenterBgV = NEwCenterScanView()
@@ -372,51 +369,27 @@ extension NEwBlueSubscribeVC {
 
 extension NEwBlueSubscribeVC {
     
-    func updatePrice(productsm: [NEwBlueProManager.IAPProduct]?) {
+    func updatePrice() {
         
-        if let products = productsm {
-            let weekProd = products.first {
-                $0.iapID == NEwBlueProManager.IAPType.week.rawValue
-            }
-            //
-            let monthProd = products.first {
-                $0.iapID == NEwBlueProManager.IAPType.month.rawValue
-            }
-            //
-            let yearProd = products.first {
-                $0.iapID == NEwBlueProManager.IAPType.year.rawValue
-            }
-            //
-            if let weekp = weekProd {
-                defaultWeekPrice = weekp.price
-            }
-            if let monthp = monthProd {
-                defaultMonthPrice = monthp.price
-                currentSymbol = monthp.priceLocale.currencySymbol ?? "$"
-            }
-            if let yearp = yearProd {
-                defaultYearPrice = yearp.price
-            }
-        }
         //"\(currentSymbol)\(Double(defaultYearPrice/12).accuracyToString(position: 2))/mo"
         
-        weekProBtn.updatePrice(str: "\(currentSymbol) \(defaultWeekPrice)")
-        monthProBtn.updatePrice(str: "\(currentSymbol) \(defaultMonthPrice)")
-        yearProBtn.updatePrice(str: "\(currentSymbol) \(defaultYearPrice)")
+        weekProBtn.updatePrice(str: "\(NEwBlueProManager.default.currentSymbol) \(NEwBlueProManager.default.defaultWeekPrice)")
+        monthProBtn.updatePrice(str: "\(NEwBlueProManager.default.currentSymbol) \(NEwBlueProManager.default.defaultMonthPrice)")
+        yearProBtn.updatePrice(str: "\(NEwBlueProManager.default.currentSymbol) \(NEwBlueProManager.default.defaultYearPrice)")
         
     }
     
     func fetchPriceLabels() {
         
         if NEwBlueProManager.default.currentProducts.count == NEwBlueProManager.default.iapTypeList.count {
-            updatePrice(productsm: NEwBlueProManager.default.currentProducts)
+            updatePrice()
         } else {
-            updatePrice(productsm: nil)
+            updatePrice()
             NEwBlueProManager.default.fetchPurchaseInfo {[weak self] productList in
                 guard let `self` = self else {return}
                 DispatchQueue.main.async {
                     if productList.count == NEwBlueProManager.default.iapTypeList.count {
-                        self.updatePrice(productsm: productList)
+                        self.updatePrice()
                     }
                 }
             }

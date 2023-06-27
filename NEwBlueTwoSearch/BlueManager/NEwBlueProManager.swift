@@ -15,6 +15,10 @@ import StoreKit
 class NEwBlueProManager {
     public static var `default` = NEwBlueProManager()
     
+    var defaultWeekPrice: String = "3.99"
+    var defaultMonthPrice: String = "8.99"
+    var defaultYearPrice: String = "29.99"
+    var currentSymbol: String = "$"
     
     public enum NwVerifyLocalSubscriptionResult {
         case notPurchased
@@ -194,14 +198,46 @@ extension NEwBlueProManager {
 }
 
 extension NEwBlueProManager {
+//    public func fetchPurchaseInfo(block: @escaping (([NEwBlueProManager.IAPProduct]) -> Void)) {
+//        let iapList = iapTypeList.map { $0.rawValue }
+//
+//        SwiftyStoreKit.retrieveProductsInfo(Set(iapList)) { result in
+//            let priceList = result.retrievedProducts.compactMap { $0 }
+//            let localList = priceList.compactMap { NEwBlueProManager.IAPProduct(iapID: $0.productIdentifier, price: $0.price.doubleValue.rounded(digits: 2), priceLocale: $0.priceLocale, localizedPrice: $0.localizedPrice, currencyCode: $0.priceLocale.currencyCode)
+//            }
+//            self.currentProducts = localList
+//            block(localList)
+//        }
+//
+//    }
     public func fetchPurchaseInfo(block: @escaping (([NEwBlueProManager.IAPProduct]) -> Void)) {
+        
+        if self.currentProducts.count == self.iapTypeList.count {
+            block(self.currentProducts)
+            return
+        }
+        
         let iapList = iapTypeList.map { $0.rawValue }
-
         SwiftyStoreKit.retrieveProductsInfo(Set(iapList)) { result in
             let priceList = result.retrievedProducts.compactMap { $0 }
             let localList = priceList.compactMap { NEwBlueProManager.IAPProduct(iapID: $0.productIdentifier, price: $0.price.doubleValue.rounded(digits: 2), priceLocale: $0.priceLocale, localizedPrice: $0.localizedPrice, currencyCode: $0.priceLocale.currencyCode)
             }
             self.currentProducts = localList
+            
+            //
+            self.currentSymbol = localList.first?.priceLocale.currencySymbol ?? "$"
+            
+            for producti in localList {
+                
+                if producti.iapID == NEwBlueProManager.IAPType.month.rawValue {
+                    NEwBlueProManager.default.defaultMonthPrice = producti.price.accuracyToString(position: 2)
+                } else if producti.iapID == NEwBlueProManager.IAPType.year.rawValue {
+                    NEwBlueProManager.default.defaultYearPrice = producti.price.accuracyToString(position: 2)
+                } else if producti.iapID == NEwBlueProManager.IAPType.week.rawValue {
+                    NEwBlueProManager.default.defaultWeekPrice = producti.price.accuracyToString(position: 2)
+                }
+            }
+            
             block(localList)
         }
         

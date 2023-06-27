@@ -24,8 +24,49 @@ class NEwBlueSplGuideVC: UIViewController {
         view.backgroundColor = .white
         view.clipsToBounds = true
         
-        let onceV = NEwSplashPageOne()
-        viewList.append(onceV)
+        let onceV = NEwSplashPageOne(frame: .zero, splType: .page1)
+        let twoV = NEwSplashPageOne(frame: .zero, splType: .page2)
+        let threeV = NEwSplashPageTwo()
+        viewList = [onceV, twoV, threeV]
+        
+        onceV.continueClickBlock = {
+            [weak self] in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                self.continueBtnClickAction()
+            }
+        }
+        twoV.continueClickBlock = {
+            [weak self] in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                self.continueBtnClickAction()
+            }
+        }
+        
+        threeV.cancelBtnClickBlock = {
+            [weak self] in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                self.continueBtnClickAction()
+            }
+        }
+        threeV.continueClickBlock = {
+            [weak self] in
+            guard let `self` = self else {return}
+            DispatchQueue.main.async {
+                
+                NEwBlueProManager.default.subscribeProvipOrder(iapType: .week, source: "week") { success, errorStr in
+                    if success {
+                        self.continueBtnClickAction()
+                    } else {
+                        KRProgressHUD.showInfo(withMessage: errorStr)
+                    }
+                }
+            }
+        }
+        
+        
         
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal

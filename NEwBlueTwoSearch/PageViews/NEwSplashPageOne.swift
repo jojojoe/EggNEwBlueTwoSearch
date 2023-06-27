@@ -9,12 +9,36 @@ import UIKit
 
 class NEwSplashPageOne: UIView {
 
-    let nameStr = "Track Your Lost Devices"
-    let infoStr = "Can't find your lost bluetooth\ndevices"
+    enum SplahsPageType {
+        case page1
+        case page2
+    }
+    
+    var splType: SplahsPageType
+    var iconImgStr = "splashp1"
+    var pointIconStr = "splpoint_1"
+    var nameStr = "Track Your Lost Devices"
+    var infoStr = "Can't find your lost bluetooth\ndevices"
     var continueClickBlock: (()->Void)?
     
-    override init(frame: CGRect) {
+    init(frame: CGRect, splType: SplahsPageType) {
+        self.splType = splType
         super.init(frame: frame)
+        switch splType {
+        case .page1:
+            iconImgStr = "splashp1"
+            pointIconStr = "splpoint_1"
+            nameStr = "Track Your Lost Devices"
+            infoStr = "Can't find your lost bluetooth\ndevices"
+            
+        case .page2:
+            iconImgStr = "splashp2"
+            pointIconStr = "splpoint_2"
+            nameStr = "Get Pinpoint Location"
+            infoStr = "Get lost devices location"
+            
+        }
+        
         
         setupV()
     }
@@ -27,12 +51,12 @@ class NEwSplashPageOne: UIView {
         backgroundColor(.white)
         let iconImgV = UIImageView()
             .adhere(toSuperview: self) {
-                $0.left.equalToSuperview().offset(0)
+                $0.left.equalToSuperview().offset(25)
                 $0.centerX.equalToSuperview()
                 $0.bottom.equalTo(safeAreaLayoutGuide.snp.centerY).offset(20)
                 $0.height.equalTo(UIScreen.main.bounds.size.width)
             }
-            .image("splashp1")
+            .image(iconImgStr)
             .contentMode(.scaleAspectFit)
         //
         let contiNextBtn = UIButton()
@@ -89,7 +113,7 @@ class NEwSplashPageOne: UIView {
                 $0.width.equalTo(112/2)
                 $0.height.equalTo(12/2)
             }
-            .image("splpoint_1")
+            .image(pointIconStr)
         
         
     }
