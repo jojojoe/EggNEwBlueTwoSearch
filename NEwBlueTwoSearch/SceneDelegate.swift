@@ -30,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         
 #if DEBUG
-        showS = true
+//        showS = true
 #endif
         
         if showS {

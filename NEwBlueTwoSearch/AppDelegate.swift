@@ -10,27 +10,13 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-//    com.find.spy.device
 /*
  
- 产品名    Device Finder
- 包名    com.find.spy.device
+    Device Finder
+    com.find.spy.device
  App ID    6450285725
- Contact 邮箱    dham_huang_dad390@outlook.com
-     
-     
- 内购IAP ID    com.find.spy.device.week
- 内购IAP 价格    $4.99
- 内购IAP ID    com.find.spy.device.month
- 内购IAP 价格    $9.99
- 内购IAP ID    com.find.spy.device.lifetime
- 内购IAP 价格    $29.99
- Secret Key    79b1dc4457734c25931a50f251d68a19
-     
-     
- Privacy Policy    https://sites.google.com/view/device-finder-pp/home
- Terms of Use    https://sites.google.com/view/devicefinder-tou/home
-
+ Contact     dham_huang_dad390@outlook.com
+ 
  */
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

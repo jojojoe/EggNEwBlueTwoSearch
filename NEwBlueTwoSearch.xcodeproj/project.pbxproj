@@ -43,6 +43,7 @@
 		D8E76A2F2A3579B2008BD289 /* NEwSplashPageTwo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A2E2A3579B2008BD289 /* NEwSplashPageTwo.swift */; };
 		D8E76A312A3579BC008BD289 /* NEwSplashPageThree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E76A302A3579BC008BD289 /* NEwSplashPageThree.swift */; };
 		EB9B88762A333590007208D4 /* NEwBlueSplGuideVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */; };
+		EB9CEBC12A4C400C00EC136C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9CEBC02A4C400C00EC136C /* StoreKit.framework */; };
 		EB9E453D2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */; };
 		EB9E453F2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */; };
 		EB9E45412A2F251F0068AACB /* NEwBlueDevicePostionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */; };
@@ -96,6 +97,7 @@
 		EB9B88732A333471007208D4 /* NEwBlueProManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueProManager.swift; sourceTree = "<group>"; };
 		EB9B88752A333590007208D4 /* NEwBlueSplGuideVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueSplGuideVC.swift; sourceTree = "<group>"; };
 		EB9CEBBF2A4C2D7F00EC136C /* configstore.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = configstore.storekit; sourceTree = "<group>"; };
+		EB9CEBC02A4C400C00EC136C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		EB9E453C2A2F24DC0068AACB /* NEwBlueDeviceContentVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDeviceContentVC.swift; sourceTree = "<group>"; };
 		EB9E453E2A2F24FD0068AACB /* NEwBlueDeviceListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDeviceListVC.swift; sourceTree = "<group>"; };
 		EB9E45402A2F251F0068AACB /* NEwBlueDevicePostionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NEwBlueDevicePostionVC.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EBF49E9907D95F9FA6DBC275 /* Pods_NEwBlueTwoSearch.framework in Frameworks */,
+				EB9CEBC12A4C400C00EC136C /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +119,7 @@
 		5250314D8FE73D97209F30A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EB9CEBC02A4C400C00EC136C /* StoreKit.framework */,
 				8B9AA163C554EB5C9F9E40EE /* Pods_NEwBlueTwoSearch.framework */,
 			);
 			name = Frameworks;
@@ -578,9 +582,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 97Y24FFSPP;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Device Finder";
@@ -603,7 +607,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xx.88888888;
+				PRODUCT_BUNDLE_IDENTIFIER = com.find.spy.device;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -622,9 +626,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 97Y24FFSPP;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NEwBlueTwoSearch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Device Finder";
@@ -647,7 +651,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xx.888888;
+				PRODUCT_BUNDLE_IDENTIFIER = com.find.spy.device;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
