@@ -412,10 +412,12 @@ extension NEwBlueToolManager: CBCentralManagerDelegate {
 
 extension NEwBlueToolManager {
     func showOpenSubscribeProVC(fuVC: UIViewController) {
-        /* sub
+        ///* sub
         let vc = NEwBlueSubscribeVC()
-        fuVC.navigationController?.pushViewController(vc, animated: true)
-         */
+        vc.modalPresentationStyle = .fullScreen
+        fuVC.present(vc, animated: true)
+//        fuVC.navigationController?.pushViewController(vc, animated: true)
+         //*/
     }
 }
 

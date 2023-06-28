@@ -76,20 +76,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //                    SKStoreReviewController.requestReview()
 //                } else {
                     if !NEwBlueProManager.default.inSubscription {
-                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
-                            [weak self] in
-                            guard let `self` = self else {return}
-                            let subsVC = NEwBlueSubscribeVC()
-                            subsVC.modalPresentationStyle = .fullScreen
-                            self.VC.present(subsVC, animated: true)
-                            subsVC.pageDisappearBlock = {
+                        if isShowingSplase {
+                            DispatchQueue.main.async {
+//                                SKStoreReviewController.requestReview()
+                            }
+                        } else {
+                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.2) {
                                 [weak self] in
                                 guard let `self` = self else {return}
-                                DispatchQueue.main.async {
-                                    SKStoreReviewController.requestReview()
+                                
+                                
+                                let subsVC = NEwBlueSubscribeVC()
+                                subsVC.modalPresentationStyle = .fullScreen
+                                self.VC.present(subsVC, animated: true)
+                                subsVC.pageDisappearBlock = {
+                                    [weak self] in
+                                    guard let `self` = self else {return}
+                                    DispatchQueue.main.async {
+                                        SKStoreReviewController.requestReview()
+                                    }
                                 }
                             }
                         }
+                        
                     } else {
                         NotificationCenter.default.post(
                             name: NSNotification.Name(rawValue: NEwBlueProManager.PurchaseNotificationKeys.success),

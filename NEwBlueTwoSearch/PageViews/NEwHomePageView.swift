@@ -26,7 +26,12 @@ class NEwHomePageView: UIView {
     }
     
     func updateSubscribeStatus() {
-        probtn.isHidden = true
+        if NEwBlueProManager.default.inSubscription {
+            probtn.isHidden = true
+        } else {
+            probtn.isHidden = false
+        }
+        
     }
     
     func showSearchingStatus(isShow: Bool) {
@@ -146,7 +151,6 @@ class NEwHomePageView: UIView {
             }
             .target(target: self, action: #selector(tapStartScanClick), event: .touchUpInside)
        
-        
     }
     
     @objc func probtnClick() {

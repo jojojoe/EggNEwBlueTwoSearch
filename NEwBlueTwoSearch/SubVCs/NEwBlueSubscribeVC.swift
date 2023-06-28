@@ -17,7 +17,7 @@ class NEwBlueSubscribeVC: UIViewController {
     let scanCenterBgV = NEwCenterScanView()
     let monthProBtn = NEwStoreBtn(frame: .zero, productType: .month)
     let weekProBtn = NEwStoreBtn(frame: .zero, productType: .week)
-    let yearProBtn = NEwStoreBtn(frame: .zero, productType: .year)
+    let yearProBtn = NEwStoreBtn(frame: .zero, productType: .life)
     var didlayoutOnce = Once()
     var pageDisappearBlock: (()->Void)?
     
@@ -301,7 +301,7 @@ extension NEwBlueSubscribeVC {
         weekProBtn.isSelected = false
         monthProBtn.isSelected = false
         yearProBtn.isSelected = true
-        NEwBlueProManager.default.currentIapType = .year
+        NEwBlueProManager.default.currentIapType = .life
     }
     
     @objc func proContinueBtnClick() {
@@ -493,12 +493,13 @@ class NEwStoreBtn: UIButton {
             .adhere(toSuperview: self) {
                 $0.top.equalTo(priceLabel.snp.bottom).offset(4)
                 $0.centerX.equalToSuperview()
-                $0.left.equalToSuperview().offset(2)
+                $0.left.equalToSuperview().offset(4)
                 $0.height.equalTo(18)
             }
             .textAlignment(.center)
             .font(UIFont.SFProTextRegular, 12)
             .color(UIColor(hexString: "#595F97")!)
+            .adjustsFontSizeToFitWidth()
         
         //
         var typeStr: String = ""
@@ -507,8 +508,8 @@ class NEwStoreBtn: UIButton {
             typeStr = "Weekly"
         case .month:
             typeStr = "Monthly"
-        case .year:
-            typeStr = "Annual"
+        case .life:
+            typeStr = "LifeTime"
         }
         
         //
@@ -539,8 +540,8 @@ class NEwStoreBtn: UIButton {
             typeStr = "week"
         case .month:
             typeStr = "month"
-        case .year:
-            typeStr = "year"
+        case .life:
+            typeStr = "lifetime"
         }
         priceTypeLabel.text("\(str) / \(typeStr)")
     }

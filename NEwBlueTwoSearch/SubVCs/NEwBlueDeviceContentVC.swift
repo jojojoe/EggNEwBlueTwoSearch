@@ -167,6 +167,7 @@ class NEwBlueDeviceContentVC: UIViewController {
     }
 
     func userSubscriVC() {
+        NEwBlueToolManager.default.showOpenSubscribeProVC(fuVC: self)
 //        let subsVC = BSiegDeSubscVC()
 //        subsVC.modalPresentationStyle = .fullScreen
 //        self.present(subsVC, animated: true)
@@ -381,23 +382,29 @@ extension NEwBlueDeviceContentVC {
     
     @objc func vibBtnClick() {
         NEwBlueToolManager.default.giveTapVib()
-        vibBtn.isSelected = !vibBtn.isSelected
-        if vibBtn.isSelected == true {
-            NEwBlueToolManager.default.playFeedVib()
+        
+        if !NEwBlueProManager.default.inSubscription {
+            userSubscriVC()
         } else {
-            NEwBlueToolManager.default.stopVibTimer()
+            vibBtn.isSelected = !vibBtn.isSelected
+            if vibBtn.isSelected == true {
+                NEwBlueToolManager.default.playFeedVib()
+            } else {
+                NEwBlueToolManager.default.stopVibTimer()
+            }
         }
+        
         
     }
     
     @objc func positionBtnClick() {
         NEwBlueToolManager.default.giveTapVib()
-//        if !NEwBlueToolManager.default.inSubscription {
-//            userSubscriVC()
-//        } else {
+        if !NEwBlueProManager.default.inSubscription {
+            userSubscriVC()
+        } else {
             let vc = NEwBlueDevicePostionVC(bluetoothDevice: peripheralItem)
             self.navigationController?.pushViewController(vc, animated: true)
-//        }
+        }
         
     }
     

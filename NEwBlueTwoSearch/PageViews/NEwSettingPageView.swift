@@ -26,13 +26,26 @@ class NEwSettingPageView: UIView {
     }
     
     func updateSubscribeStatus() {
-        wangguanBg.isHidden = true
-        shareBgImgV.snp.remakeConstraints({
-            $0.left.equalToSuperview().offset(24)
-            $0.top.equalTo(wangguanBg.snp.top).offset(0)
-            $0.width.equalTo(btnW)
-            $0.height.equalTo(btnW * 128.0/342)
-        })
+        
+        if NEwBlueProManager.default.inSubscription {
+            wangguanBg.isHidden = true
+            shareBgImgV.snp.remakeConstraints({
+                $0.left.equalToSuperview().offset(24)
+                $0.top.equalTo(wangguanBg.snp.top).offset(0)
+                $0.width.equalTo(btnW)
+                $0.height.equalTo(btnW * 128.0/342)
+            })
+        } else {
+            wangguanBg.isHidden = false
+            shareBgImgV.snp.remakeConstraints({
+                $0.left.equalToSuperview().offset(24)
+                $0.top.equalTo(wangguanBg.snp.bottom).offset(20)
+                $0.width.equalTo(btnW)
+                $0.height.equalTo(btnW * 128.0/342)
+            })
+        }
+        
+        
         restoreBg.isHidden = true
             
     }
@@ -162,11 +175,9 @@ extension NEwSettingPageView {
     @objc func wangguanBtnClick() {
         NEwBlueToolManager.default.giveTapVib()
         if let vc = self.fatherFuVC {
-            /* sub
-            let subscribe = NEwBlueSubscribeVC()
-            subscribe.modalPresentationStyle = .fullScreen
-            vc.present(subscribe, animated: true)
-             */
+            ///* sub
+            NEwBlueToolManager.default.showOpenSubscribeProVC(fuVC: vc)
+             //*/
         }
     }
     
@@ -196,7 +207,7 @@ extension NEwSettingPageView {
     
     @objc func restoreBtnClick() {
         NEwBlueToolManager.default.giveTapVib()
-        /* sub
+        ///* sub
         if NEwBlueProManager.default.inSubscription {
             KRProgressHUD.showSuccess(withMessage: "You are already in the subscription period!")
         } else {
@@ -208,7 +219,7 @@ extension NEwSettingPageView {
                 }
             }
         }
-         */
+         //*/
     }
 }
 

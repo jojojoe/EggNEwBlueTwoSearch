@@ -22,9 +22,27 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         NEwBlueToolManager.default.prepare()
         //
+        addPostNoti()
         setView1()
         bluetoothBtnClick()
 
+    }
+    
+    func addPostNoti() {
+        NotificationCenter.default.addObserver(self, selector: #selector(subscribeSuccess(notification: )), name: NSNotification.Name(rawValue: NEwBlueProManager.PurchaseNotificationKeys.success), object: nil)
+    }
+    
+    @objc func subscribeSuccess(notification: Notification) {
+        DispatchQueue.main.async {
+            [weak self] in
+            guard let `self` = self else {return}
+            self.settingPage.updateSubscribeStatus()
+            self.homePage.updateSubscribeStatus()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func setView1() {
@@ -42,6 +60,7 @@ class ViewController: UIViewController {
                 $0.left.right.top.bottom.equalToSuperview()
             }
         //
+        homePage.fatherFuVC = self
         homePage
             .adhere(toSuperview: contentV) {
                 $0.left.right.top.bottom.equalToSuperview()

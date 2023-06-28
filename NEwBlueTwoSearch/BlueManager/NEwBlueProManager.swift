@@ -15,8 +15,8 @@ import StoreKit
 class NEwBlueProManager {
     public static var `default` = NEwBlueProManager()
     
-    var defaultWeekPrice: String = "3.99"
-    var defaultMonthPrice: String = "8.99"
+    var defaultWeekPrice: String = "4.99"
+    var defaultMonthPrice: String = "9.99"
     var defaultYearPrice: String = "29.99"
     var currentSymbol: String = "$"
     
@@ -29,14 +29,15 @@ class NEwBlueProManager {
     
     var inSubscription: Bool = false
     var currentProducts: [NEwBlueProManager.IAPProduct] = []
-    var iapTypeList: [IAPType] = [.month, .year, .week]
+    var iapTypeList: [IAPType] = [.month, .life, .week]
     var currentIapType: IAPType = .month
     
     
     public enum IAPType: String {
-        case week = "com.find.cellphones.week"
-        case month = "com.find.cellphones.month"
-        case year = "com.find.cellphones.year"
+        case week = "com.find.spy.device.week"
+        case month = "com.find.spy.device.month"
+//        case year = "com.find.spy.device.year"
+        case life = "com.find.spy.device.lifetime"
     }
     
     public struct PurchaseNotificationKeys {
@@ -60,6 +61,23 @@ class NEwBlueProManager {
 }
 
 extension NEwBlueProManager {
+    func completeTransactions() {
+        SwiftyStoreKit.completeTransactions(atomically: true) { purchases in
+            for purchase in purchases {
+                switch purchase.transaction.transactionState {
+                case .purchased, .restored:
+                    if purchase.needsFinishTransaction {
+                        SwiftyStoreKit.finishTransaction(purchase.transaction)
+                    }
+                    break
+                case .failed, .purchasing, .deferred:
+                    break
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
     
     public func restore(_ successBlock: ((Bool) -> Void)? = nil) {
         
@@ -231,7 +249,7 @@ extension NEwBlueProManager {
                 
                 if producti.iapID == NEwBlueProManager.IAPType.month.rawValue {
                     NEwBlueProManager.default.defaultMonthPrice = producti.price.accuracyToString(position: 2)
-                } else if producti.iapID == NEwBlueProManager.IAPType.year.rawValue {
+                } else if producti.iapID == NEwBlueProManager.IAPType.life.rawValue {
                     NEwBlueProManager.default.defaultYearPrice = producti.price.accuracyToString(position: 2)
                 } else if producti.iapID == NEwBlueProManager.IAPType.week.rawValue {
                     NEwBlueProManager.default.defaultWeekPrice = producti.price.accuracyToString(position: 2)
@@ -266,7 +284,7 @@ extension NEwBlueProManager {
             switch result {
             // receipt is validated
             case .success(let receipt):
-                let oneTimePurchase = "life"//IAPType.life.rawValue
+                let oneTimePurchase = IAPType.life.rawValue
                 let item = receipt.purchases.first {
                     return $0.productIdentifier == oneTimePurchase
                 }

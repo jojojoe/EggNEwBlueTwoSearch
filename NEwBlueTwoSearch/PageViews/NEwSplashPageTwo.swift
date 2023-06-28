@@ -48,22 +48,7 @@ class NEwSplashPageTwo: UIView {
             }
             .backgroundImage(UIImage(named: "splash1button"))
             .target(target: self, action: #selector(contiNextBtnClick), event: .touchUpInside)
-        //
-        let cancelBtn = UIButton()
-            .adhere(toSuperview: self) {
-                $0.centerX.equalToSuperview()
-                $0.bottom.equalTo(contiNextBtn.snp.top).offset(-24)
-                $0.width.equalTo(288)
-                $0.height.equalTo(30)
-            }
-//            .titleColor(UIColor(hexString: "#262B55")!.withAlphaComponent(0.3))
-//            .font(UIFont.SFProTextMedium, 12)
-//            .backgroundImage(UIImage(named: "splash1button"))
-            .target(target: self, action: #selector(cancelBtnClick), event: .touchUpInside)
         
-        let attriStr = NSAttributedString(string: "Cancel anytime Or continue with limited version", attributes: [NSAttributedString.Key.font : UIFont(name: UIFont.SFProTextMedium, size: 12) ?? UIFont.systemFont(ofSize: 12), NSAttributedString.Key.foregroundColor : UIColor(hexString: "#262B55")!.withAlphaComponent(0.3), NSAttributedString.Key.underlineStyle : 1, NSAttributedString.Key.underlineColor : UIColor(hexString: "#262B55")!.withAlphaComponent(0.3)])
-        
-        cancelBtn.setAttributedTitle(attriStr, for: .normal)
         
         
         //
@@ -113,7 +98,22 @@ class NEwSplashPageTwo: UIView {
             }
             .image(pointIconStr)
         
+        //
+        let cancelBtn = UIButton()
+            .adhere(toSuperview: self) {
+                $0.centerX.equalToSuperview()
+                $0.bottom.equalTo(contiNextBtn.snp.top).offset(-24)
+                $0.width.equalTo(288)
+                $0.height.equalTo(30)
+            }
+//            .titleColor(UIColor(hexString: "#262B55")!.withAlphaComponent(0.3))
+//            .font(UIFont.SFProTextMedium, 12)
+//            .backgroundImage(UIImage(named: "splash1button"))
+            .target(target: self, action: #selector(cancelBtnClick), event: .touchUpInside)
         
+        let attriStr = NSAttributedString(string: "Cancel anytime Or continue with limited version", attributes: [NSAttributedString.Key.font : UIFont(name: UIFont.SFProTextMedium, size: 12) ?? UIFont.systemFont(ofSize: 12), NSAttributedString.Key.foregroundColor : UIColor(hexString: "#262B55")!.withAlphaComponent(0.3), NSAttributedString.Key.underlineStyle : 1, NSAttributedString.Key.underlineColor : UIColor(hexString: "#262B55")!.withAlphaComponent(0.3)])
+        
+        cancelBtn.setAttributedTitle(attriStr, for: .normal)
     }
     
     
